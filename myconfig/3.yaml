@@ -1,0 +1,19 @@
+Camera.name: "theta"
+Camera.setup: "monocular"
+Camera.model: "fisheye"
+
+Camera.fx: 222
+Camera.fy: 222
+Camera.cx: 318
+Camera.cy: 351
+
+Camera.k1: 0.054387
+Camera.k2: -0.335888
+Camera.k3: 0.272988
+Camera.k4: -0.013658
+
+Camera.fps: 30.0
+Camera.cols: 640
+Camera.rows: 720
+
+Camera.color_order: "Gray"
