@@ -19,7 +19,7 @@
 namespace openvslam {
 
 system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file_path)
-    : cfg_(cfg), camera_(cfg->camera_) {
+    : cfg_(cfg), camera_(cfg->camera_), tracker_num(1){
     spdlog::debug("CONSTRUCT: system");
 
     std::cout << R"(  ___               __   _____ _      _   __  __ )" << std::endl;
@@ -83,6 +83,88 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
     // connect modules each other
     tracker_->set_mapping_module(mapper_);
     tracker_->set_global_optimization_module(global_optimizer_);
+    mapper_->set_tracking_module(tracker_);
+    mapper_->set_global_optimization_module(global_optimizer_);
+    global_optimizer_->set_tracking_module(tracker_);
+    global_optimizer_->set_mapping_module(mapper_);
+}
+
+system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file_path, int tn)
+    : cfg_(cfg), camera_(cfg->camera_), tracker_num(tn) {
+    spdlog::debug("CONSTRUCT: system");
+
+    std::cout << R"(  ___               __   _____ _      _   __  __ )" << std::endl;
+    std::cout << R"( / _ \ _ __  ___ _ _\ \ / / __| |    /_\ |  \/  |)" << std::endl;
+    std::cout << R"(| (_) | '_ \/ -_) ' \\ V /\__ \ |__ / _ \| |\/| |)" << std::endl;
+    std::cout << R"( \___/| .__/\___|_||_|\_/ |___/____/_/ \_\_|  |_|)" << std::endl;
+    std::cout << R"(      |_|                                        )" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Copyright (C) 2019," << std::endl;
+    std::cout << "National Institute of Advanced Industrial Science and Technology (AIST)" << std::endl;
+    std::cout << "All rights reserved." << std::endl;
+    std::cout << std::endl;
+    std::cout << "This is free software," << std::endl;
+    std::cout << "and you are welcome to redistribute it under certain conditions." << std::endl;
+    std::cout << "See the LICENSE file." << std::endl;
+    std::cout << std::endl;
+
+    // show configuration
+    std::cout << *cfg_ << std::endl;
+
+    // load ORB vocabulary
+    spdlog::info("loading ORB vocabulary: {}", vocab_file_path);
+#ifdef USE_DBOW2
+    bow_vocab_ = new data::bow_vocabulary();
+    try {
+        bow_vocab_->loadFromBinaryFile(vocab_file_path);
+    }
+    catch (const std::exception& e) {
+        spdlog::critical("wrong path to vocabulary");
+        delete bow_vocab_;
+        bow_vocab_ = nullptr;
+        exit(EXIT_FAILURE);
+    }
+#else
+    bow_vocab_ = new fbow::Vocabulary();
+    bow_vocab_->readFromFile(vocab_file_path);
+    if (!bow_vocab_->isValid()) {
+        spdlog::critical("wrong path to vocabulary");
+        delete bow_vocab_;
+        bow_vocab_ = nullptr;
+        exit(EXIT_FAILURE);
+    }
+#endif
+
+    // database
+    cam_db_ = new data::camera_database(camera_);
+    map_db_ = new data::map_database();
+    bow_db_ = new data::bow_database(bow_vocab_);
+
+    // frame and map publisher
+    frame_publisher_ = std::shared_ptr<publish::frame_publisher>(new publish::frame_publisher(cfg_, map_db_));
+    map_publisher_ = std::shared_ptr<publish::map_publisher>(new publish::map_publisher(cfg_, map_db_));
+
+    // tracking module
+    std::cout << "make trackers" << std::endl;
+//    tracker_ = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_);
+    trackers_ = new tracking_module*[tracker_num];
+    for (int i = 0; i < tracker_num; ++i) {
+        trackers_[i] = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_);
+    }
+    tracker_ = trackers_[0];
+    std::cout << "set tracker" << std::endl;
+    // mapping module
+    mapper_ = new mapping_module(map_db_, camera_->setup_type_ == camera::setup_type_t::Monocular);
+    // global optimization module
+    global_optimizer_ = new global_optimization_module(map_db_, bow_db_, bow_vocab_, camera_->setup_type_ != camera::setup_type_t::Monocular);
+
+    // connect modules each other
+    for (int j = 0; j < tracker_num; ++j) {
+        trackers_[j]->set_mapping_module(mapper_);
+        trackers_[j]->set_global_optimization_module(global_optimizer_);
+    }
+//    tracker_->set_mapping_module(mapper_);
+//    tracker_->set_global_optimization_module(global_optimizer_);
     mapper_->set_tracking_module(tracker_);
     mapper_->set_global_optimization_module(global_optimizer_);
     global_optimizer_->set_tracking_module(tracker_);
@@ -176,6 +258,15 @@ const std::shared_ptr<publish::map_publisher> system::get_map_publisher() const 
     return map_publisher_;
 }
 
+const std::shared_ptr<publish::map_publisher> system::get_map_publisher(int i) const {
+    if (i == 0) {
+        return map_publisher_;
+    }
+    else {
+        return map_publisher_1;
+    }
+}
+
 const std::shared_ptr<publish::frame_publisher> system::get_frame_publisher() const {
     return frame_publisher_;
 }
@@ -240,6 +331,21 @@ Mat44_t system::feed_monocular_frame(const cv::Mat& img, const double timestamp,
     const Mat44_t cam_pose_cw = tracker_->track_monocular_image(img, timestamp, mask);
 
     frame_publisher_->update(tracker_);
+    if (tracker_->tracking_state_ == tracker_state_t::Tracking) {
+        map_publisher_->set_current_cam_pose(cam_pose_cw);
+    }
+
+    return cam_pose_cw;
+}
+
+Mat44_t system::feed_monocular_frames(const cv::Mat& img, const double timestamp, const cv::Mat& mask, int track_num) {
+    assert(camera_->setup_type_ == camera::setup_type_t::Monocular);
+
+    check_reset_request();
+
+    const Mat44_t cam_pose_cw = trackers_[track_num]->track_monocular_image(img, timestamp, mask);
+
+    frame_publisher_->update(trackers_[track_num]);
     if (tracker_->tracking_state_ == tracker_state_t::Tracking) {
         map_publisher_->set_current_cam_pose(cam_pose_cw);
     }

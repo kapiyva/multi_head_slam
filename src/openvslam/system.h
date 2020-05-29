@@ -37,6 +37,7 @@ class system {
 public:
     //! Constructor
     system(const std::shared_ptr<config>& cfg, const std::string& vocab_file_path);
+    system(const std::shared_ptr<config>& cfg, const std::string& vocab_file_path, int tracker_num);
 
     //! Destructor
     ~system();
@@ -67,9 +68,11 @@ public:
 
     //! Get the map publisher
     const std::shared_ptr<publish::map_publisher> get_map_publisher() const;
+    const std::shared_ptr<publish::map_publisher> get_map_publisher(int i) const;
 
     //! Get the frame publisher
     const std::shared_ptr<publish::frame_publisher> get_frame_publisher() const;
+    const std::shared_ptr<publish::frame_publisher> get_frame_publisher(int i) const;
 
     //-----------------------------------------
     // module management
@@ -104,6 +107,7 @@ public:
     //! Feed a monocular frame to SLAM system
     //! (NOTE: distorted images are acceptable if calibrated)
     Mat44_t feed_monocular_frame(const cv::Mat& img, const double timestamp, const cv::Mat& mask = cv::Mat{});
+    Mat44_t feed_monocular_frames(const cv::Mat& img, const double timestamp, const cv::Mat& mask = cv::Mat{}, int track_num = 0);
 
     //! Feed a stereo frame to SLAM system
     //! (Note: Left and Right images must be stereo-rectified)
@@ -172,6 +176,7 @@ private:
 
     //! tracker
     tracking_module* tracker_ = nullptr;
+    tracking_module** trackers_ = nullptr;
 
     //! mapping module
     mapping_module* mapper_ = nullptr;
@@ -206,6 +211,7 @@ private:
 
     //! mutex for flags of enable/disable loop detector
     mutable std::mutex mtx_loop_detector_;
+    int tracker_num;
 };
 
 } // namespace openvslam

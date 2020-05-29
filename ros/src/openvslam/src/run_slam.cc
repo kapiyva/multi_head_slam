@@ -34,7 +34,8 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
     const cv::Mat mask = mask_img_path.empty() ? cv::Mat{} : cv::imread(mask_img_path, cv::IMREAD_GRAYSCALE);
 
     // build a SLAM system
-    openvslam::system SLAM(cfg, vocab_file_path);
+//    openvslam::system SLAM(cfg, vocab_file_path);
+    openvslam::system SLAM(cfg, vocab_file_path,2);
     // startup the SLAM process
     SLAM.startup();
 
@@ -59,12 +60,28 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
         const auto timestamp = std::chrono::duration_cast<std::chrono::duration<double>>(tp_1 - tp_0).count();
 
         // input the current frame and estimate the camera pose
-        SLAM.feed_monocular_frame(cv_bridge::toCvShare(msg, "bgr8")->image, timestamp, mask);
+//        SLAM.feed_monocular_frame(cv_bridge::toCvShare(msg, "bgr8")->image, timestamp, mask);
+      SLAM.feed_monocular_frames(cv_bridge::toCvShare(msg, "bgr8")->image, timestamp, mask, 0);
 
-        const auto tp_2 = std::chrono::steady_clock::now();
+      const auto tp_2 = std::chrono::steady_clock::now();
 
         const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
         track_times.push_back(track_time);
+    });
+
+
+    image_transport::Subscriber sub_1 = it.subscribe("theta2/image_raw", 1, [&](const sensor_msgs::ImageConstPtr& msg) {
+      const auto tp_1 = std::chrono::steady_clock::now();
+      const auto timestamp = std::chrono::duration_cast<std::chrono::duration<double>>(tp_1 - tp_0).count();
+
+      // input the current frame and estimate the camera pose
+//        SLAM.feed_monocular_frame(cv_bridge::toCvShare(msg, "bgr8")->image, timestamp, mask);
+      SLAM.feed_monocular_frames(cv_bridge::toCvShare(msg, "bgr8")->image, timestamp, mask, 1);
+
+      const auto tp_2 = std::chrono::steady_clock::now();
+
+      const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
+      track_times.push_back(track_time);
     });
 
     // run the viewer in another thread
