@@ -258,15 +258,6 @@ const std::shared_ptr<publish::map_publisher> system::get_map_publisher() const 
     return map_publisher_;
 }
 
-const std::shared_ptr<publish::map_publisher> system::get_map_publisher(int i) const {
-    if (i == 0) {
-        return map_publisher_;
-    }
-    else {
-        return map_publisher_1;
-    }
-}
-
 const std::shared_ptr<publish::frame_publisher> system::get_frame_publisher() const {
     return frame_publisher_;
 }
@@ -345,9 +336,11 @@ Mat44_t system::feed_monocular_frames(const cv::Mat& img, const double timestamp
 
     const Mat44_t cam_pose_cw = trackers_[track_num]->track_monocular_image(img, timestamp, mask);
 
-    frame_publisher_->update(trackers_[track_num]);
-    if (tracker_->tracking_state_ == tracker_state_t::Tracking) {
-        map_publisher_->set_current_cam_pose(cam_pose_cw);
+    if (track_num == 0) {
+        frame_publisher_->update(trackers_[track_num]);
+        if (tracker_->tracking_state_ == tracker_state_t::Tracking) {
+            map_publisher_->set_current_cam_pose(cam_pose_cw);
+        }
     }
 
     return cam_pose_cw;
