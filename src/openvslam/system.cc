@@ -166,8 +166,10 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
 //    tracker_->set_mapping_module(mapper_);
 //    tracker_->set_global_optimization_module(global_optimizer_);
     mapper_->set_tracking_module(tracker_);
+//    mapper_->set_tracking_modules(tracker_);
     mapper_->set_global_optimization_module(global_optimizer_);
     global_optimizer_->set_tracking_module(tracker_);
+//    global_optimizer_->set_tracking_modules(tracker_);
     global_optimizer_->set_mapping_module(mapper_);
 }
 

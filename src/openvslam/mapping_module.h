@@ -33,6 +33,7 @@ public:
 
     //! Set the tracking module
     void set_tracking_module(tracking_module* tracker);
+    void set_tracking_modules(tracking_module* trackers[]);
 
     //! Set the global optimization module
     void set_global_optimization_module(global_optimization_module* global_optimizer);
@@ -178,6 +179,7 @@ private:
 
     //! tracking module
     tracking_module* tracker_ = nullptr;
+    tracking_module** trackers_ = nullptr;
     //! global optimization module
     global_optimization_module* global_optimizer_ = nullptr;
 
