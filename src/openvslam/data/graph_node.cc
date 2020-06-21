@@ -249,6 +249,7 @@ void graph_node::erase_spanning_child(keyframe* keyfrm) {
 
 void graph_node::recover_spanning_connections() {
     std::lock_guard<std::mutex> lock(mtx_);
+    std::cout << "recover_spanning locked" << std::endl;
 
     // 1. find new parents for my children
 
