@@ -155,27 +155,32 @@ void keyframe::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 }
 
 Mat44_t keyframe::get_cam_pose() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return cam_pose_cw_;
 }
 
 Mat44_t keyframe::get_cam_pose_inv() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return cam_pose_wc_;
 }
 
 Vec3_t keyframe::get_cam_center() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return cam_center_;
 }
 
 Mat33_t keyframe::get_rotation() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return cam_pose_cw_.block<3, 3>(0, 0);
 }
 
 Vec3_t keyframe::get_translation() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return cam_pose_cw_.block<3, 1>(0, 3);
 }
 
@@ -190,12 +195,14 @@ void keyframe::compute_bow() {
 }
 
 void keyframe::add_landmark(landmark* lm, const unsigned int idx) {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     landmarks_.at(idx) = lm;
 }
 
 void keyframe::erase_landmark_with_index(const unsigned int idx) {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     landmarks_.at(idx) = nullptr;
 }
 
@@ -211,12 +218,14 @@ void keyframe::replace_landmark(landmark* lm, const unsigned int idx) {
 }
 
 std::vector<landmark*> keyframe::get_landmarks() const {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return landmarks_;
 }
 
 std::set<landmark*> keyframe::get_valid_landmarks() const {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     std::set<landmark*> valid_landmarks;
 
     for (const auto lm : landmarks_) {
@@ -234,7 +243,8 @@ std::set<landmark*> keyframe::get_valid_landmarks() const {
 }
 
 unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_thr) const {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     unsigned int num_tracked_lms = 0;
 
     if (0 < min_num_obs_thr) {
@@ -268,7 +278,8 @@ unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_
 }
 
 landmark* keyframe::get_landmark(const unsigned int idx) const {
-    std::lock_guard<std::mutex> lock(mtx_observations_);
+    // std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     return landmarks_.at(idx);
 }
 
@@ -291,7 +302,8 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const float unproj_y = (y - camera->cy_) * depth * camera->fy_inv_;
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
-                std::lock_guard<std::mutex> lock(mtx_pose_);
+                // std::lock_guard<std::mutex> lock(mtx_pose_);
+                std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
                 return cam_pose_wc_.block<3, 3>(0, 0) * pos_c + cam_pose_wc_.block<3, 1>(0, 3);
             }
             else {
@@ -309,7 +321,8 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const float unproj_y = (y - camera->cy_) * depth * camera->fy_inv_;
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
-                std::lock_guard<std::mutex> lock(mtx_pose_);
+                // std::lock_guard<std::mutex> lock(mtx_pose_);
+                std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
                 return cam_pose_wc_.block<3, 3>(0, 0) * pos_c + cam_pose_wc_.block<3, 1>(0, 3);
             }
             else {
@@ -329,7 +342,8 @@ float keyframe::compute_median_depth(const bool abs) const {
     Mat44_t cam_pose_cw;
     {
         std::lock_guard<std::mutex> lock1(mtx_observations_);
-        std::lock_guard<std::mutex> lock2(mtx_pose_);
+        // std::lock_guard<std::mutex> lock2(mtx_pose_);
+        std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
         landmarks = landmarks_;
         cam_pose_cw = cam_pose_cw_;
     }
