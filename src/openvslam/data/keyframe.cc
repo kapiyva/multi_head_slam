@@ -136,7 +136,8 @@ nlohmann::json keyframe::to_json() const {
 }
 
 void keyframe::set_cam_pose(const Mat44_t& cam_pose_cw) {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::shared_lock<std::shared_timed_mutex> lock(mtx_pose_);
     cam_pose_cw_ = cam_pose_cw;
 
     const Mat33_t rot_cw = cam_pose_cw_.block<3, 3>(0, 0);
