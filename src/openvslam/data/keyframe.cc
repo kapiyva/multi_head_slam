@@ -136,7 +136,12 @@ nlohmann::json keyframe::to_json() const {
 }
 
 void keyframe::set_cam_pose(const Mat44_t& cam_pose_cw) {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
     cam_pose_cw_ = cam_pose_cw;
 
     const Mat33_t rot_cw = cam_pose_cw_.block<3, 3>(0, 0);
@@ -154,27 +159,53 @@ void keyframe::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 }
 
 Mat44_t keyframe::get_cam_pose() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
+
     return cam_pose_cw_;
 }
 
 Mat44_t keyframe::get_cam_pose_inv() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
     return cam_pose_wc_;
 }
 
 Vec3_t keyframe::get_cam_center() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
     return cam_center_;
 }
 
 Mat33_t keyframe::get_rotation() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
     return cam_pose_cw_.block<3, 3>(0, 0);
 }
 
 Vec3_t keyframe::get_translation() const {
-    std::lock_guard<std::mutex> lock(mtx_pose_);
+    // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock())
+    {
+        continue;
+    }
     return cam_pose_cw_.block<3, 1>(0, 3);
 }
 
