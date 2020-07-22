@@ -291,8 +291,7 @@ private:
     // camera pose
 
     //! need mutex for access to poses
-//    mutable std::mutex mtx_pose_;
-    mutable std::share_timed_mutex mtx_pose_;
+    mutable std::mutex mtx_pose_;
     //! camera pose from the world to the current
     Mat44_t cam_pose_cw_;
     //! camera pose from the current to the world
@@ -304,6 +303,7 @@ private:
     // observations
 
     //! need mutex for access to observations
+    // mutable std::mutex mtx_observations_;
     mutable std::mutex mtx_observations_;
     //! observed landmarks
     std::vector<landmark*> landmarks_;
