@@ -223,7 +223,7 @@ void keyframe::compute_bow() {
 
 void keyframe::add_landmark(landmark* lm, const unsigned int idx) {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock())
     {
         continue;
@@ -233,7 +233,7 @@ void keyframe::add_landmark(landmark* lm, const unsigned int idx) {
 
 void keyframe::erase_landmark_with_index(const unsigned int idx) {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock())
     {
         continue;
@@ -254,7 +254,7 @@ void keyframe::replace_landmark(landmark* lm, const unsigned int idx) {
 
 std::vector<landmark*> keyframe::get_landmarks() const {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock())
     {
         continue;
@@ -265,7 +265,7 @@ std::vector<landmark*> keyframe::get_landmarks() const {
 
 std::set<landmark*> keyframe::get_valid_landmarks() const {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     std::set<landmark*> valid_landmarks;
 
     for (const auto lm : landmarks_) {
@@ -318,8 +318,8 @@ unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_
 }
 
 landmark* keyframe::get_landmark(const unsigned int idx) const {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_);
+//     std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock()) {
         continue;
     }
