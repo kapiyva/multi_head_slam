@@ -303,7 +303,6 @@ private:
     // observations
 
     //! need mutex for access to observations
-    // mutable std::mutex mtx_observations_;
     mutable std::mutex mtx_observations_;
     //! observed landmarks
     std::vector<landmark*> landmarks_;
