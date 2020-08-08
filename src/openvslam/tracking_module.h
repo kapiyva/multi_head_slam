@@ -44,6 +44,9 @@ public:
     tracking_module(const std::shared_ptr<config>& cfg, system* system, data::map_database* map_db,
                     data::bow_vocabulary* bow_vocab, data::bow_database* bow_db);
 
+
+    tracking_module(const std::shared_ptr<config>& cfg, system* system, data::map_database* map_db,
+                    data::bow_vocabulary* bow_vocab, data::bow_database* bow_db, int tn);
     //! Destructor
     ~tracking_module();
 
@@ -123,6 +126,8 @@ public:
     //! elapsed microseconds for each tracking
     double elapsed_ms_ = 0.0;
 
+    int tracker_num;
+
 protected:
     //-----------------------------------------
     // tracking processes
@@ -150,6 +155,7 @@ protected:
 
     //! Update the local map
     void update_local_map();
+    void update_local_map(int tracker_num);
 
     //! Update the local keyframes
     void update_local_keyframes();

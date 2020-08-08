@@ -149,7 +149,7 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
 //    tracker_ = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_);
     trackers_ = new tracking_module*[tracker_num];
     for (int i = 0; i < tracker_num; ++i) {
-        trackers_[i] = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_);
+        trackers_[i] = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_, i);
     }
     tracker_ = trackers_[0];
     std::cout << "set tracker" << std::endl;
@@ -265,7 +265,11 @@ const std::shared_ptr<publish::frame_publisher> system::get_frame_publisher() co
 }
 
 void system::enable_mapping_module() {
-    std::lock_guard<std::mutex> lock(mtx_mapping_);
+//    std::lock_guard<std::mutex> lock(mtx_mapping_);
+    std::unique_lock<std::mutex> lock(mtx_mapping_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     if (!system_is_running_) {
         spdlog::critical("please call system::enable_mapping_module() after system::startup()");
     }
@@ -276,7 +280,11 @@ void system::enable_mapping_module() {
 }
 
 void system::disable_mapping_module() {
-    std::lock_guard<std::mutex> lock(mtx_mapping_);
+//    std::lock_guard<std::mutex> lock(mtx_mapping_);
+    std::unique_lock<std::mutex> lock(mtx_mapping_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     if (!system_is_running_) {
         spdlog::critical("please call system::disable_mapping_module() after system::startup()");
     }
@@ -295,12 +303,20 @@ bool system::mapping_module_is_enabled() const {
 }
 
 void system::enable_loop_detector() {
-    std::lock_guard<std::mutex> lock(mtx_loop_detector_);
+//    std::lock_guard<std::mutex> lock(mtx_loop_detector_);
+    std::unique_lock<std::mutex> lock(mtx_loop_detector_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     global_optimizer_->enable_loop_detector();
 }
 
 void system::disable_loop_detector() {
-    std::lock_guard<std::mutex> lock(mtx_loop_detector_);
+//    std::lock_guard<std::mutex> lock(mtx_loop_detector_);
+    std::unique_lock<std::mutex> lock(mtx_loop_detector_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     global_optimizer_->disable_loop_detector();
 }
 
@@ -391,27 +407,47 @@ void system::resume_tracker() {
 }
 
 void system::request_reset() {
-    std::lock_guard<std::mutex> lock(mtx_reset_);
+//    std::lock_guard<std::mutex> lock(mtx_reset_);
+    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     reset_is_requested_ = true;
 }
 
 bool system::reset_is_requested() const {
-    std::lock_guard<std::mutex> lock(mtx_reset_);
+//    std::lock_guard<std::mutex> lock(mtx_reset_);
+    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return reset_is_requested_;
 }
 
 void system::request_terminate() {
-    std::lock_guard<std::mutex> lock(mtx_terminate_);
+//    std::lock_guard<std::mutex> lock(mtx_terminate_);
+    std::unique_lock<std::mutex> lock(mtx_terminate_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     terminate_is_requested_ = true;
 }
 
 bool system::terminate_is_requested() const {
-    std::lock_guard<std::mutex> lock(mtx_terminate_);
+//    std::lock_guard<std::mutex> lock(mtx_terminate_);
+    std::unique_lock<std::mutex> lock(mtx_terminate_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return terminate_is_requested_;
 }
 
 void system::check_reset_request() {
-    std::lock_guard<std::mutex> lock(mtx_reset_);
+//    std::lock_guard<std::mutex> lock(mtx_reset_);
+    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     if (reset_is_requested_) {
         tracker_->reset();
         reset_is_requested_ = false;

@@ -20,7 +20,7 @@ namespace openvslam {
 
 tracking_module::tracking_module(const std::shared_ptr<config>& cfg, system* system, data::map_database* map_db,
                                  data::bow_vocabulary* bow_vocab, data::bow_database* bow_db)
-    : cfg_(cfg), camera_(cfg->camera_), system_(system), map_db_(map_db), bow_vocab_(bow_vocab), bow_db_(bow_db),
+    : cfg_(cfg), camera_(cfg->camera_), tracker_num(0), system_(system), map_db_(map_db), bow_vocab_(bow_vocab), bow_db_(bow_db),
       initializer_(cfg->camera_->setup_type_, map_db, bow_db, cfg->yaml_node_),
       frame_tracker_(camera_, 10), relocalizer_(bow_db_), pose_optimizer_(),
       keyfrm_inserter_(cfg_->camera_->setup_type_, cfg_->true_depth_thr_, map_db, bow_db, 0, cfg_->camera_->fps_) {
@@ -35,6 +35,26 @@ tracking_module::tracking_module(const std::shared_ptr<config>& cfg, system* sys
         extractor_right_ = new feature::orb_extractor(cfg_->orb_params_);
     }
 }
+
+
+tracking_module::tracking_module(const std::shared_ptr<config>& cfg, system* system, data::map_database* map_db,
+                                 data::bow_vocabulary* bow_vocab, data::bow_database* bow_db,int tn)
+    : cfg_(cfg), camera_(cfg->camera_), tracker_num(tn), system_(system), map_db_(map_db), bow_vocab_(bow_vocab), bow_db_(bow_db),
+      initializer_(cfg->camera_->setup_type_, map_db, bow_db, cfg->yaml_node_),
+      frame_tracker_(camera_, 10), relocalizer_(bow_db_), pose_optimizer_(),
+      keyfrm_inserter_(cfg_->camera_->setup_type_, cfg_->true_depth_thr_, map_db, bow_db, 0, cfg_->camera_->fps_) {
+    spdlog::debug("CONSTRUCT: tracking_module");
+
+    extractor_left_ = new feature::orb_extractor(cfg_->orb_params_);
+    if (camera_->setup_type_ == camera::setup_type_t::Monocular) {
+        ini_extractor_left_ = new feature::orb_extractor(cfg_->orb_params_);
+        ini_extractor_left_->set_max_num_keypoints(ini_extractor_left_->get_max_num_keypoints() * 2);
+    }
+    if (camera_->setup_type_ == camera::setup_type_t::Stereo) {
+        extractor_right_ = new feature::orb_extractor(cfg_->orb_params_);
+    }
+}
+
 
 tracking_module::~tracking_module() {
     delete extractor_left_;
@@ -180,7 +200,8 @@ void tracking_module::track() {
         }
 
         // update the reference keyframe, local keyframes, and local landmarks
-        update_local_map();
+//        update_local_map();
+        update_local_map(tracker_num);
 
         // pass all of the keyframes to the mapping module
         const auto keyfrms = map_db_->get_all_keyframes();
@@ -392,6 +413,13 @@ void tracking_module::update_local_map() {
     update_local_landmarks();
 
     map_db_->set_local_landmarks(local_landmarks_);
+}
+
+void tracking_module::update_local_map(int tracker_num) {
+    update_local_keyframes();
+    update_local_landmarks();
+
+    map_db_->set_local_landmarks(local_landmarks_, tracker_num);
 }
 
 void tracking_module::update_local_keyframes() {

@@ -11,7 +11,11 @@ graph_node::graph_node(data::keyframe* keyfrm, const bool spanning_parent_is_not
 void graph_node::add_connection(keyframe* keyfrm, const unsigned int weight) {
     bool need_update = false;
     {
-        std::lock_guard<std::mutex> lock(mtx_);
+//        std::lock_guard<std::mutex> lock(mtx_);
+        std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
+        }
         if (!connected_keyfrms_and_weights_.count(keyfrm)) {
             // if `keyfrm` not exists
             connected_keyfrms_and_weights_[keyfrm] = weight;
@@ -32,7 +36,11 @@ void graph_node::add_connection(keyframe* keyfrm, const unsigned int weight) {
 void graph_node::erase_connection(keyframe* keyfrm) {
     bool need_update = false;
     {
-        std::lock_guard<std::mutex> lock(mtx_);
+//        std::lock_guard<std::mutex> lock(mtx_);
+        std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
+        }
         if (connected_keyfrms_and_weights_.count(keyfrm)) {
             connected_keyfrms_and_weights_.erase(keyfrm);
             need_update = true;
@@ -128,8 +136,11 @@ void graph_node::update_connections() {
     }
 
     {
-        std::lock_guard<std::mutex> lock(mtx_);
-
+//        std::lock_guard<std::mutex> lock(mtx_);
+        std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
+        }
         connected_keyfrms_and_weights_ = keyfrm_weights;
         ordered_covisibilities_ = ordered_covisibilities;
         ordered_weights_ = ordered_weights;
@@ -145,7 +156,11 @@ void graph_node::update_connections() {
 }
 
 void graph_node::update_covisibility_orders() {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
 
     std::vector<std::pair<unsigned int, keyframe*>> weight_keyfrm_pairs;
     weight_keyfrm_pairs.reserve(connected_keyfrms_and_weights_.size());
@@ -168,7 +183,12 @@ void graph_node::update_covisibility_orders() {
 }
 
 std::set<keyframe*> graph_node::get_connected_keyframes() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     std::set<keyframe*> keyfrms;
 
     for (const auto& keyfrm_and_weight : connected_keyfrms_and_weights_) {
@@ -179,12 +199,21 @@ std::set<keyframe*> graph_node::get_connected_keyframes() const {
 }
 
 std::vector<keyframe*> graph_node::get_covisibilities() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return ordered_covisibilities_;
 }
 
 std::vector<keyframe*> graph_node::get_top_n_covisibilities(const unsigned int num_covisibilities) const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     if (ordered_covisibilities_.size() < num_covisibilities) {
         return ordered_covisibilities_;
     }
@@ -194,7 +223,11 @@ std::vector<keyframe*> graph_node::get_top_n_covisibilities(const unsigned int n
 }
 
 std::vector<keyframe*> graph_node::get_covisibilities_over_weight(const unsigned int weight) const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
 
     if (ordered_covisibilities_.empty()) {
         return std::vector<keyframe*>();
@@ -211,7 +244,12 @@ std::vector<keyframe*> graph_node::get_covisibilities_over_weight(const unsigned
 }
 
 unsigned int graph_node::get_weight(keyframe* keyfrm) const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     if (connected_keyfrms_and_weights_.count(keyfrm)) {
         return connected_keyfrms_and_weights_.at(keyfrm);
     }
@@ -221,41 +259,70 @@ unsigned int graph_node::get_weight(keyframe* keyfrm) const {
 }
 
 void graph_node::set_spanning_parent(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     assert(!spanning_parent_);
     spanning_parent_ = keyfrm;
 }
 
 keyframe* graph_node::get_spanning_parent() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     return spanning_parent_;
 }
 
 void graph_node::change_spanning_parent(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
+
     spanning_parent_ = keyfrm;
     keyfrm->graph_node_->add_spanning_child(owner_keyfrm_);
 }
 
 void graph_node::add_spanning_child(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     spanning_children_.insert(keyfrm);
 }
 
 void graph_node::erase_spanning_child(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     spanning_children_.erase(keyfrm);
 }
 
 void graph_node::recover_spanning_connections() {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     std::cout << "recover_spanning locked" << std::endl;
 
     // 1. find new parents for my children
 
+    std::cout << "find new parents" << std::endl;
     std::set<keyframe*> new_parent_candidates;
     new_parent_candidates.insert(spanning_parent_);
 
+    std::cout << "before while" << std::endl;
     while (!spanning_children_.empty()) {
         bool max_is_found = false;
 
@@ -312,29 +379,49 @@ void graph_node::recover_spanning_connections() {
 }
 
 std::set<keyframe*> graph_node::get_spanning_children() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return spanning_children_;
 }
 
 bool graph_node::has_spanning_child(keyframe* keyfrm) const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return static_cast<bool>(spanning_children_.count(keyfrm));
 }
 
 void graph_node::add_loop_edge(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     loop_edges_.insert(keyfrm);
     // cannot erase loop edges
     owner_keyfrm_->set_not_to_be_erased();
 }
 
 std::set<keyframe*> graph_node::get_loop_edges() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return loop_edges_;
 }
 
 bool graph_node::has_loop_edge() const {
-    std::lock_guard<std::mutex> lock(mtx_);
+//    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::mutex> lock(mtx_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     return !loop_edges_.empty();
 }
 
