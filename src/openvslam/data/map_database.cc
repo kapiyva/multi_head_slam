@@ -79,10 +79,15 @@ void map_database::set_local_landmarks(const std::vector<landmark*>& local_lms) 
 void map_database::set_local_landmarks(const std::vector<landmark*>& local_lms, int tracker_num) {
     if (tracker_num == 0) {
         std::lock_guard<std::mutex> lock(mtx_map_access_);
+        std::cout << "success lock" << std::endl;
+        local_landmarks_ = local_lms;
     }else{
         std::lock_guard<std::mutex> lock(mtx_map_access_2);
+        std::cout << "success lock2" << std::endl;
+        local_landmarks_2 = local_lms;
     }
-    local_landmarks_vec[tracker_num] = local_lms;
+//    local_landmarks_ = local_lms;
+//    local_landmarks_vec.at(tracker_num) = local_lms;
 }
 
 std::vector<landmark*> map_database::get_local_landmarks() const {
@@ -97,10 +102,12 @@ std::vector<landmark*> map_database::get_local_landmarks() const {
 std::vector<landmark*> map_database::get_local_landmarks(int tracker_num) const {
     if (tracker_num == 0){
         std::lock_guard<std::mutex> lock(mtx_map_access_);
+        return local_landmarks_;
     }else{
         std::lock_guard<std::mutex> lock(mtx_map_access_2);
+        return local_landmarks_2;
     }
-    return local_landmarks_vec[tracker_num];
+//    return local_landmarks_;
 }
 
 std::vector<keyframe*> map_database::get_all_keyframes() const {

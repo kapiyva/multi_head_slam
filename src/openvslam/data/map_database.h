@@ -214,7 +214,8 @@ private:
 
     //! local landmarks
     std::vector<landmark*> local_landmarks_;
-    std::vector<std::vector<landmark*>> local_landmarks_vec;
+    std::vector<landmark*> local_landmarks_2;
+//    std::vector<std::vector<landmark*>> local_landmarks_vec;
 
     //! max keyframe ID
     unsigned int max_keyfrm_id_ = 0;
