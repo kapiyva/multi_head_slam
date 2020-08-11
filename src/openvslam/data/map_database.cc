@@ -25,7 +25,11 @@ map_database::~map_database() {
 }
 
 void map_database::add_keyframe(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     keyframes_[keyfrm->id_] = keyfrm;
     if (keyfrm->id_ > max_keyfrm_id_) {
         max_keyfrm_id_ = keyfrm->id_;
@@ -33,26 +37,42 @@ void map_database::add_keyframe(keyframe* keyfrm) {
 }
 
 void map_database::erase_keyframe(keyframe* keyfrm) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     keyframes_.erase(keyfrm->id_);
 
     // TODO: delete object
 }
 
 void map_database::add_landmark(landmark* lm) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     landmarks_[lm->id_] = lm;
 }
 
 void map_database::erase_landmark(landmark* lm) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     landmarks_.erase(lm->id_);
 
     // TODO: delete object
 }
 
 void map_database::set_local_landmarks(const std::vector<landmark*>& local_lms) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     local_landmarks_ = local_lms;
 }
 
@@ -66,12 +86,29 @@ void map_database::set_local_landmarks(const std::vector<landmark*>& local_lms, 
 }
 
 std::vector<landmark*> map_database::get_local_landmarks() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     return local_landmarks_;
 }
 
+std::vector<landmark*> map_database::get_local_landmarks(int tracker_num) const {
+    if (tracker_num == 0){
+        std::lock_guard<std::mutex> lock(mtx_map_access_);
+    }else{
+        std::lock_guard<std::mutex> lock(mtx_map_access_2);
+    }
+    return local_landmarks_vec[tracker_num];
+}
+
 std::vector<keyframe*> map_database::get_all_keyframes() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     std::vector<keyframe*> keyframes;
     keyframes.reserve(keyframes_.size());
     for (const auto id_keyframe : keyframes_) {
@@ -81,12 +118,20 @@ std::vector<keyframe*> map_database::get_all_keyframes() const {
 }
 
 unsigned int map_database::get_num_keyframes() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     return keyframes_.size();
 }
 
 std::vector<landmark*> map_database::get_all_landmarks() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     std::vector<landmark*> landmarks;
     landmarks.reserve(landmarks_.size());
     for (const auto id_landmark : landmarks_) {
@@ -96,17 +141,29 @@ std::vector<landmark*> map_database::get_all_landmarks() const {
 }
 
 unsigned int map_database::get_num_landmarks() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     return landmarks_.size();
 }
 
 unsigned int map_database::get_max_keyframe_id() const {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
     return max_keyfrm_id_;
 }
 
 void map_database::clear() {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
 
     for (auto& lm : landmarks_) {
         delete lm.second;
@@ -131,7 +188,11 @@ void map_database::clear() {
 
 void map_database::from_json(camera_database* cam_db, bow_vocabulary* bow_vocab, bow_database* bow_db,
                              const nlohmann::json& json_keyfrms, const nlohmann::json& json_landmarks) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
 
     // Step 1. delete all the data in map database
     for (auto& lm : landmarks_) {
@@ -336,7 +397,11 @@ void map_database::register_association(const unsigned int keyfrm_id, const nloh
 }
 
 void map_database::to_json(nlohmann::json& json_keyfrms, nlohmann::json& json_landmarks) {
-    std::lock_guard<std::mutex> lock(mtx_map_access_);
+//    std::lock_guard<std::mutex> lock(mtx_map_access_);
+    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
+    while(!lock.try_lock()){
+        continue;
+    }
 
     // Save each keyframe as json
     spdlog::info("encoding {} keyframes to store", keyframes_.size());
