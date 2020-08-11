@@ -226,7 +226,7 @@ void tracking_module::track() {
 
         // update the local map and optimize the camera pose of the current frame
         if (succeeded) {
-            update_local_map();
+            update_local_map(tracker_num);
             succeeded = optimize_current_frame_with_local_map();
         }
 
@@ -415,11 +415,11 @@ void tracking_module::update_local_map() {
     map_db_->set_local_landmarks(local_landmarks_);
 }
 
-void tracking_module::update_local_map(int tracker_num) {
+void tracking_module::update_local_map(int tn) {
     update_local_keyframes();
     update_local_landmarks();
 
-    map_db_->set_local_landmarks(local_landmarks_, tracker_num);
+    map_db_->set_local_landmarks(local_landmarks_, tn);
 }
 
 void tracking_module::update_local_keyframes() {

@@ -65,12 +65,14 @@ public:
      * @param local_lms
      */
     void set_local_landmarks(const std::vector<landmark*>& local_lms);
+    void set_local_landmarks(const std::vector<landmark*>& local_lms,int tracker_num);
 
     /**
      * Get local landmarks
      * @return
      */
     std::vector<landmark*> get_local_landmarks() const;
+    std::vector<landmark*> get_local_landmarks(int tracker_num) const;
 
     /**
      * Get all of the keyframes in the database
@@ -200,6 +202,7 @@ private:
 
     //! mutex for mutual exclusion controll between class methods
     mutable std::mutex mtx_map_access_;
+    mutable std::mutex mtx_map_access_2;
 
     //-----------------------------------------
     // keyframe and landmark database
@@ -211,6 +214,7 @@ private:
 
     //! local landmarks
     std::vector<landmark*> local_landmarks_;
+    std::vector<std::vector<landmark*>> local_landmarks_vec;
 
     //! max keyframe ID
     unsigned int max_keyfrm_id_ = 0;
