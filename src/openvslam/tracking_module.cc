@@ -101,6 +101,7 @@ Mat44_t tracking_module::track_monocular_image(const cv::Mat& img, const double 
     img_gray_ = img;
     util::convert_to_grayscale(img_gray_, camera_->color_order_);
 
+//    std::cout << tracking_state_ << std::endl;
     // create current frame object
     if (tracking_state_ == tracker_state_t::NotInitialized || tracking_state_ == tracker_state_t::Initializing) {
         curr_frm_ = data::frame(img_gray_, timestamp, ini_extractor_left_, bow_vocab_, camera_, cfg_->true_depth_thr_, mask);
@@ -182,7 +183,6 @@ void tracking_module::track() {
     if (tracking_state_ == tracker_state_t::NotInitialized) {
         tracking_state_ = tracker_state_t::Initializing;
     }
-
     last_tracking_state_ = tracking_state_;
 
     // check if pause is requested
@@ -214,23 +214,28 @@ void tracking_module::track() {
     }
     else {
         // apply replace of landmarks observed in the last frame
+        std::cout << "track() 1" << std::endl;
         apply_landmark_replace();
         // update the camera pose of the last frame
         // because the mapping module might optimize the camera pose of the last frame's reference keyframe
+        std::cout << "track() 2" << std::endl;
         update_last_frame();
 
         // set the reference keyframe of the current frame
         curr_frm_.ref_keyfrm_ = ref_keyfrm_;
 
+        std::cout << "track() 3" << std::endl;
         auto succeeded = track_current_frame();
 
         // update the local map and optimize the camera pose of the current frame
+        std::cout << "track() 4" << std::endl;
         if (succeeded) {
             update_local_map(tracker_num);
             succeeded = optimize_current_frame_with_local_map();
         }
 
         // update the motion model
+        std::cout << "track() 5" << std::endl;
         if (succeeded) {
             update_motion_model();
         }
@@ -239,7 +244,9 @@ void tracking_module::track() {
         tracking_state_ = succeeded ? tracker_state_t::Tracking : tracker_state_t::Lost;
 
         // update the frame statistics
+        std::cout << "track() 6" << std::endl;
         map_db_->update_frame_statistics(curr_frm_, tracking_state_ == tracker_state_t::Lost);
+        std::cout << "track() 7" << std::endl;
 
         // if tracking is failed within 5.0 sec after initialization, reset the system
         constexpr float init_retry_thr = 5.0;
@@ -250,22 +257,26 @@ void tracking_module::track() {
             return;
         }
 
+        std::cout << "track() 8" << std::endl;
         // show message if tracking has been lost
         if (last_tracking_state_ != tracker_state_t::Lost && tracking_state_ == tracker_state_t::Lost) {
             spdlog::info("tracking lost: frame {}", curr_frm_.id_);
         }
 
+        std::cout << "track() 9" << std::endl;
         // check to insert the new keyframe derived from the current frame
         if (succeeded && new_keyframe_is_needed()) {
             insert_new_keyframe();
         }
 
+        std::cout << "track() 10" << std::endl;
         // tidy up observations
         for (unsigned int idx = 0; idx < curr_frm_.num_keypts_; ++idx) {
             if (curr_frm_.landmarks_.at(idx) && curr_frm_.outlier_flags_.at(idx)) {
                 curr_frm_.landmarks_.at(idx) = nullptr;
             }
         }
+        std::cout << "track() 11" << std::endl;
     }
 
     // store the relative pose from the reference keyframe to the current frame
@@ -346,9 +357,11 @@ void tracking_module::apply_landmark_replace() {
         }
 
         auto replaced_lm = lm->get_replaced();
+        std::cout << "tm get_replaced()" << std::endl;
         if (replaced_lm) {
             last_frm_.landmarks_.at(idx) = replaced_lm;
         }
+        std::cout << "tm apply lm replace if finished" << std::endl;
     }
 }
 
@@ -358,6 +371,7 @@ void tracking_module::update_last_frame() {
     if (!last_ref_keyfrm) {
         return;
     }
+    std::cout << "before set_cam_pose" << std::endl;
     last_frm_.set_cam_pose(last_cam_pose_from_ref_keyfrm_ * last_ref_keyfrm->get_cam_pose());
 }
 
@@ -419,7 +433,9 @@ void tracking_module::update_local_map(int tn) {
     update_local_keyframes();
     update_local_landmarks();
 
+    std::cout << "before set to map db" << tn << std::endl;
     map_db_->set_local_landmarks(local_landmarks_, tn);
+    std::cout << "after set to map db" << std::endl;
 }
 
 void tracking_module::update_local_keyframes() {

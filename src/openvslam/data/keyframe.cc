@@ -159,10 +159,9 @@ void keyframe::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 }
 
 Mat44_t keyframe::get_cam_pose() const {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()) {
         continue;
     }
 
