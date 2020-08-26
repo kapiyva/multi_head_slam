@@ -137,7 +137,9 @@ nlohmann::json keyframe::to_json() const {
 
 void keyframe::set_cam_pose(const Mat44_t& cam_pose_cw) {
     // std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::cout << "keyframe set cam pose()" << std::endl;
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    std::cout << "keyframe try to get lock" << std::endl;
     while (!lock.try_lock())
     {
         continue;
@@ -160,6 +162,7 @@ void keyframe::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 
 Mat44_t keyframe::get_cam_pose() const {
 //    std::lock_guard<std::mutex> lock(mtx_pose_);
+    std::cout << "keyframe get cam pose()" << std::endl;
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
     while (!lock.try_lock()) {
         continue;
@@ -265,6 +268,9 @@ std::vector<landmark*> keyframe::get_landmarks() const {
 std::set<landmark*> keyframe::get_valid_landmarks() const {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     std::set<landmark*> valid_landmarks;
 
     for (const auto lm : landmarks_) {
@@ -283,7 +289,10 @@ std::set<landmark*> keyframe::get_valid_landmarks() const {
 
 unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_thr) const {
     // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_);
+    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
+    }
     unsigned int num_tracked_lms = 0;
 
     if (0 < min_num_obs_thr) {
@@ -345,7 +354,10 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
                 // std::lock_guard<std::mutex> lock(mtx_pose_);
-                std::unique_lock<std::mutex> lock(mtx_pose_);
+                std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+                while (!lock.try_lock()){
+                    continue;
+                }
                 return cam_pose_wc_.block<3, 3>(0, 0) * pos_c + cam_pose_wc_.block<3, 1>(0, 3);
             }
             else {
@@ -364,7 +376,10 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
                 // std::lock_guard<std::mutex> lock(mtx_pose_);
-                std::unique_lock<std::mutex> lock(mtx_pose_);
+                std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+                while (!lock.try_lock()){
+                    continue;
+                }
                 return cam_pose_wc_.block<3, 3>(0, 0) * pos_c + cam_pose_wc_.block<3, 1>(0, 3);
             }
             else {
@@ -383,8 +398,18 @@ float keyframe::compute_median_depth(const bool abs) const {
     std::vector<landmark*> landmarks;
     Mat44_t cam_pose_cw;
     {
-        std::lock_guard<std::mutex> lock1(mtx_observations_);
-        std::lock_guard<std::mutex> lock2(mtx_pose_);
+//        std::lock_guard<std::mutex> lock1(mtx_observations_);
+//        std::lock_guard<std::mutex> lock2(mtx_pose_);
+        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+        std::unique_lock<std::mutex> lock2(mtx_pose_, std::defer_lock);
+        while (!lock1.try_lock() || !lock2.try_lock()){
+            if (lock1.owns_lock()){
+                lock1.unlock();
+            }
+            if (lock2.owns_lock()) {
+                lock2.unlock();
+            }
+        }
         landmarks = landmarks_;
         cam_pose_cw = cam_pose_cw_;
     }

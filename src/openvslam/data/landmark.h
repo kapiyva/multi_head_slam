@@ -157,10 +157,10 @@ private:
     //! map database
     map_database* map_db_;
 
-//    mutable std::mutex mtx_position_;
-    mutable std::timed_mutex mtx_position_;
-//    mutable std::mutex mtx_observations_;
-    mutable std::timed_mutex mtx_observations_;
+    mutable std::mutex mtx_position_;
+//    mutable std::timed_mutex mtx_position_;
+    mutable std::mutex mtx_observations_;
+//    mutable std::timed_mutex mtx_observations_;
 };
 
 } // namespace data

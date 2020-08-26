@@ -25,65 +25,45 @@ landmark::landmark(const unsigned int id, const unsigned int first_keyfrm_id,
 
 void landmark::set_pos_in_world(const Vec3_t& pos_w) {
 //    std::lock_guard<std::mutex> lock(mtx_position_);
-//    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     pos_w_ = pos_w;
 }
 
 Vec3_t landmark::get_pos_in_world() const {
 //    std::lock_guard<std::mutex> lock(mtx_position_);
-//    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return pos_w_;
 }
 
 Vec3_t landmark::get_obs_mean_normal() const {
 //    std::lock_guard<std::mutex> lock(mtx_position_);
-//    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return mean_normal_;
 }
 
 keyframe* landmark::get_ref_keyframe() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return ref_keyfrm_;
 }
 
 void landmark::add_observation(keyframe* keyfrm, unsigned int idx) {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     if (observations_.count(keyfrm)) {
         return;
@@ -102,13 +82,9 @@ void landmark::erase_observation(keyframe* keyfrm) {
     bool discard = false;
     {
 //        std::lock_guard<std::mutex> lock(mtx_observations_);
-//        std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//        while (!lock.try_lock()){
-//            continue;
-//        }
-        if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
         }
 
         if (observations_.count(keyfrm)) {
@@ -140,52 +116,36 @@ void landmark::erase_observation(keyframe* keyfrm) {
 
 std::map<keyframe*, unsigned int> landmark::get_observations() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return observations_;
 }
 
 unsigned int landmark::num_observations() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return num_observations_;
 }
 
 bool landmark::has_observation() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return 0 < num_observations_;
 }
 
 int landmark::get_index_in_keyframe(keyframe* keyfrm) const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     if (observations_.count(keyfrm)) {
         return observations_.at(keyfrm);
@@ -197,26 +157,18 @@ int landmark::get_index_in_keyframe(keyframe* keyfrm) const {
 
 bool landmark::is_observed_in_keyframe(keyframe* keyfrm) const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return static_cast<bool>(observations_.count(keyfrm));
 }
 
 cv::Mat landmark::get_descriptor() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return descriptor_.clone();
 }
@@ -225,13 +177,9 @@ void landmark::compute_descriptor() {
     std::map<keyframe*, unsigned int> observations;
     {
 //        std::lock_guard<std::mutex> lock1(mtx_observations_);
-//        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
-//        while (!lock1.try_lock()){
-//            continue;
-//        }
-        if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+        while (!lock1.try_lock()){
+            continue;
         }
         if (will_be_erased_) {
             return;
@@ -284,13 +232,9 @@ void landmark::compute_descriptor() {
 
     {
 //        std::lock_guard<std::mutex> lock(mtx_observations_);
-//        std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//        while (!lock.try_lock()){
-//            continue;
-//        }
-        if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
         }
         descriptor_ = descriptors.at(best_idx).clone();
     }
@@ -303,9 +247,16 @@ void landmark::update_normal_and_depth() {
     {
 //        std::lock_guard<std::mutex> lock1(mtx_observations_);
 //        std::lock_guard<std::mutex> lock2(mtx_position_);
-        if (!mtx_observations_.try_lock_for(std::chrono::seconds(1)) || !mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+        std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
+        while (!lock1.try_lock() || !lock2.try_lock()){
+            if (lock1.owns_lock()){
+                lock1.unlock();
+            }
+            if (lock2.owns_lock()){
+                lock2.unlock();
+            }
+            continue;
         }
         if (will_be_erased_) {
             return;
@@ -336,11 +287,7 @@ void landmark::update_normal_and_depth() {
     const auto num_scale_levels = ref_keyfrm->num_scale_levels_;
 
     {
-//        std::lock_guard<std::mutex> lock3(mtx_position_);
-        if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
-        }
+        std::lock_guard<std::mutex> lock3(mtx_position_);
         max_valid_dist_ = dist * scale_factor;
         min_valid_dist_ = max_valid_dist_ / ref_keyfrm->scale_factors_.at(num_scale_levels - 1);
         mean_normal_ = mean_normal.normalized();
@@ -349,26 +296,18 @@ void landmark::update_normal_and_depth() {
 
 float landmark::get_min_valid_distance() const {
 //    std::lock_guard<std::mutex> lock(mtx_position_);
-//    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return 0.7 * min_valid_dist_;
 }
 
 float landmark::get_max_valid_distance() const {
 //    std::lock_guard<std::mutex> lock(mtx_position_);
-//    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return 1.3 * max_valid_dist_;
 }
@@ -377,13 +316,9 @@ unsigned int landmark::predict_scale_level(const float cam_to_lm_dist, const fra
     float ratio;
     {
 //        std::lock_guard<std::mutex> lock(mtx_position_);
-//        std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//        while (!lock.try_lock()){
-//            continue;
-//        }
-        if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
         }
         ratio = max_valid_dist_ / cam_to_lm_dist;
     }
@@ -404,13 +339,9 @@ unsigned int landmark::predict_scale_level(const float cam_to_lm_dist, const key
     float ratio;
     {
 //        std::lock_guard<std::mutex> lock(mtx_position_);
-//        std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
-//        while (!lock.try_lock()){
-//            continue;
-//        }
-        if (!mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock(mtx_position_, std::defer_lock);
+        while (!lock.try_lock()){
+            continue;
         }
         ratio = max_valid_dist_ / cam_to_lm_dist;
     }
@@ -432,16 +363,16 @@ void landmark::prepare_for_erasing() {
     {
 //        std::lock_guard<std::mutex> lock1(mtx_observations_);
 //        std::lock_guard<std::mutex> lock2(mtx_position_);
-//        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
-//        std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
-//        while (lock1.owns_lock() || lock2.owns_lock()){
-//            continue;
-//        }
-//        lock1.lock();
-//        lock2.lock();
-        if (!mtx_position_.try_lock_for(std::chrono::seconds(1)) || !mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+        std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
+        while (!lock1.try_lock() || !lock2.try_lock()){
+            if (lock1.owns_lock()){
+                lock1.unlock();
+            }
+            if (lock2.owns_lock()){
+                lock2.unlock();
+            }
+            continue;
         }
         observations = observations_;
         observations_.clear();
@@ -458,16 +389,16 @@ void landmark::prepare_for_erasing() {
 bool landmark::will_be_erased() {
 //    std::lock_guard<std::mutex> lock1(mtx_observations_);
 //    std::lock_guard<std::mutex> lock2(mtx_position_);
-//    std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
-//    std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
-//    while (lock1.owns_lock() || lock2.owns_lock()){
-//        continue;
-//    }
-//    lock1.lock();
-//    lock2.lock();
-    if (!mtx_position_.try_lock_for(std::chrono::seconds(1)) || !mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+    std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
+    while (!lock1.try_lock() || !lock2.try_lock()){
+        if (lock1.owns_lock()){
+            lock1.unlock();
+        }
+        if (lock2.owns_lock()){
+            lock2.unlock();
+        }
+        continue;
     }
     return will_be_erased_;
 }
@@ -482,16 +413,16 @@ void landmark::replace(landmark* lm) {
     {
 //        std::lock_guard<std::mutex> lock1(mtx_observations_);
 //        std::lock_guard<std::mutex> lock2(mtx_position_);
-//        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
-//        std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
-//        while (lock1.owns_lock() || lock2.owns_lock()){
-//            continue;
-//        }
-//        lock1.lock();
-//        lock2.lock();
-        if (!mtx_position_.try_lock_for(std::chrono::seconds(1)) || !mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-            std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-            throw std::system_error(ec);
+        std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+        std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
+        while (!lock1.try_lock() || !lock2.try_lock()){
+            if (lock1.owns_lock()){
+                lock1.unlock();
+            }
+            if (lock2.owns_lock()){
+                lock2.unlock();
+            }
+            continue;
         }
         observations = observations_;
         observations_.clear();
@@ -523,50 +454,48 @@ void landmark::replace(landmark* lm) {
 landmark* landmark::get_replaced() const {
 //    std::lock_guard<std::mutex> lock1(mtx_observations_);
 //    std::lock_guard<std::mutex> lock2(mtx_position_);
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1)) || !mtx_position_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
+    std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
+    std::cout << "lm get_replaced() before try to lock" << std::endl;
+//    while (lock1.owns_lock() || lock2.owns_lock()){
+//        continue;
+//    }
+    while (!lock1.try_lock() || !lock2.try_lock()){
+        if (lock1.owns_lock()){
+            lock1.unlock();
+        }
+        if (lock2.owns_lock()){
+            lock2.unlock();
+        }
+        continue;
     }
-    std::cout << "lm get_replaced() before lock" << std::endl;
     std::cout << "lm get_replaced() locked" << std::endl;
     return replaced_;
 }
 
 void landmark::increase_num_observable(unsigned int num_observable) {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     num_observable_ += num_observable;
 }
 
 void landmark::increase_num_observed(unsigned int num_observed) {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     num_observed_ += num_observed;
 }
 
 float landmark::get_observed_ratio() const {
 //    std::lock_guard<std::mutex> lock(mtx_observations_);
-//    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
-    if (!mtx_observations_.try_lock_for(std::chrono::seconds(1))) {
-        std::error_code ec(static_cast<int>(std::errc::device_or_resource_busy), std::generic_category());
-        throw std::system_error(ec);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
+    while (!lock.try_lock()){
+        continue;
     }
     return static_cast<float>(num_observed_) / num_observable_;
 }

@@ -357,11 +357,11 @@ void tracking_module::apply_landmark_replace() {
         }
 
         auto replaced_lm = lm->get_replaced();
-        std::cout << "tm get_replaced()" << std::endl;
+        std::cout << "tracker get_replaced()" << std::endl;
         if (replaced_lm) {
             last_frm_.landmarks_.at(idx) = replaced_lm;
         }
-        std::cout << "tm apply lm replace if finished" << std::endl;
+        std::cout << "tracker apply lm replace if finished" << std::endl;
     }
 }
 

@@ -434,6 +434,7 @@ std::vector<keyframe*> graph_node::extract_intersection(const T& keyfrms_1, cons
     for (const auto keyfrm_1 : keyfrms_1) {
         for (const auto keyfrm_2 : keyfrms_2) {
             std::cout << "gnode extract 2" << std::endl;
+            std::cout << (*keyfrm_1 == *keyfrm_2) << std::endl;
             if (*keyfrm_1 == *keyfrm_2) {
                 std::cout << "gnode extract 3" << std::endl;
                 intersection.push_back(keyfrm_1);
