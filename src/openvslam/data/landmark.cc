@@ -456,10 +456,6 @@ landmark* landmark::get_replaced() const {
 //    std::lock_guard<std::mutex> lock2(mtx_position_);
     std::unique_lock<std::mutex> lock1(mtx_observations_, std::defer_lock);
     std::unique_lock<std::mutex> lock2(mtx_position_, std::defer_lock);
-    std::cout << "lm get_replaced() before try to lock" << std::endl;
-//    while (lock1.owns_lock() || lock2.owns_lock()){
-//        continue;
-//    }
     while (!lock1.try_lock() || !lock2.try_lock()){
         if (lock1.owns_lock()){
             lock1.unlock();
@@ -467,9 +463,7 @@ landmark* landmark::get_replaced() const {
         if (lock2.owns_lock()){
             lock2.unlock();
         }
-        continue;
-    }
-    std::cout << "lm get_replaced() locked" << std::endl;
+   }
     return replaced_;
 }
 

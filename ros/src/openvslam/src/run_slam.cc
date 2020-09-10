@@ -81,7 +81,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
       const auto tp_2 = std::chrono::steady_clock::now();
 
       const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
-      track_times.push_back(track_time);
+//      track_times.push_back(track_time);
     });
 
     // run the viewer in another thread

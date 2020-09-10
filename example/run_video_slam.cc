@@ -26,14 +26,14 @@
 #endif
 
 void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
-                   const std::string& vocab_file_path, const std::string& video_file_path, const std::string& mask_img_path,
+                   const std::string& vocab_file_path, const std::string& video_file_path, const std::string& video_file_path2, const std::string& mask_img_path,
                    const unsigned int frame_skip, const bool no_sleep, const bool auto_term,
                    const bool eval_log, const std::string& map_db_path) {
     // load the mask image
     const cv::Mat mask = mask_img_path.empty() ? cv::Mat{} : cv::imread(mask_img_path, cv::IMREAD_GRAYSCALE);
 
     // build a SLAM system
-    openvslam::system SLAM(cfg, vocab_file_path);
+    openvslam::system SLAM(cfg, vocab_file_path, 2);
     // startup the SLAM process
     SLAM.startup();
 
@@ -46,9 +46,11 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 #endif
 
     auto video = cv::VideoCapture(video_file_path, cv::CAP_FFMPEG);
+    auto video2 = cv::VideoCapture(video_file_path2, cv::CAP_FFMPEG);
     std::vector<double> track_times;
 
     cv::Mat frame;
+    cv::Mat frame2;
     double timestamp = 0.0;
 
     unsigned int num_frame = 0;
@@ -58,12 +60,18 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     std::thread thread([&]() {
         while (is_not_end) {
             is_not_end = video.read(frame);
+            auto _ = video2.read(frame2);
 
             const auto tp_1 = std::chrono::steady_clock::now();
 
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-                SLAM.feed_monocular_frame(frame, timestamp, mask);
+                SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
+            }
+
+            if (!frame2.empty() && (num_frame % frame_skip == 0)) {
+                // input the current frame and estimate the camera pose
+                SLAM.feed_monocular_frames(frame, timestamp, mask, 1);
             }
 
             const auto tp_2 = std::chrono::steady_clock::now();
@@ -155,6 +163,7 @@ int main(int argc, char* argv[]) {
     auto help = op.add<popl::Switch>("h", "help", "produce help message");
     auto vocab_file_path = op.add<popl::Value<std::string>>("v", "vocab", "vocabulary file path");
     auto video_file_path = op.add<popl::Value<std::string>>("m", "video", "video file path");
+    auto video_file_path_2 = op.add<popl::Value<std::string>>("m2", "video2", "video file path2");
     auto config_file_path = op.add<popl::Value<std::string>>("c", "config", "config file path");
     auto mask_img_path = op.add<popl::Value<std::string>>("", "mask", "mask image path", "");
     auto frame_skip = op.add<popl::Value<unsigned int>>("", "frame-skip", "interval of frame skip", 1);

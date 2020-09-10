@@ -184,6 +184,7 @@ void map_database::clear() {
     keyframes_.clear();
     max_keyfrm_id_ = 0;
     local_landmarks_.clear();
+    local_landmarks_2.clear();
     origin_keyfrm_ = nullptr;
 
     frm_stats_.clear();

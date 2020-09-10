@@ -433,9 +433,7 @@ void tracking_module::update_local_map(int tn) {
     update_local_keyframes();
     update_local_landmarks();
 
-    std::cout << "before set to map db" << tn << std::endl;
     map_db_->set_local_landmarks(local_landmarks_, tn);
-    std::cout << "after set to map db" << std::endl;
 }
 
 void tracking_module::update_local_keyframes() {
