@@ -125,7 +125,6 @@ frame::frame(const cv::Mat& img_gray, const cv::Mat& img_depth, const double tim
 }
 
 void frame::set_cam_pose(const Mat44_t& cam_pose_cw) {
-    std::cout << "frame::set_cam_pose" << std::endl;
     cam_pose_cw_is_valid_ = true;
     cam_pose_cw_ = cam_pose_cw;
     update_pose_params();
@@ -136,7 +135,6 @@ void frame::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 }
 
 void frame::update_pose_params() {
-    std::cout << "frame::update_pose_params" << std::endl;
     rot_cw_ = cam_pose_cw_.block<3, 3>(0, 0);
     rot_wc_ = rot_cw_.transpose();
     trans_cw_ = cam_pose_cw_.block<3, 1>(0, 3);

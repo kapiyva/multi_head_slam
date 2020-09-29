@@ -144,15 +144,13 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
     frame_publisher_ = std::shared_ptr<publish::frame_publisher>(new publish::frame_publisher(cfg_, map_db_));
     map_publisher_ = std::shared_ptr<publish::map_publisher>(new publish::map_publisher(cfg_, map_db_));
 
-    // tracking module
-    std::cout << "make trackers" << std::endl;
+//    tracking module
 //    tracker_ = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_);
     trackers_ = new tracking_module*[tracker_num];
     for (int i = 0; i < tracker_num; ++i) {
         trackers_[i] = new tracking_module(cfg_, this, map_db_, bow_vocab_, bow_db_, i);
     }
     tracker_ = trackers_[0];
-    std::cout << "set tracker" << std::endl;
     // mapping module
     mapper_ = new mapping_module(map_db_, camera_->setup_type_ == camera::setup_type_t::Monocular);
     // global optimization module
@@ -168,7 +166,7 @@ system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file
 //    mapper_->set_tracking_module(tracker_);
     mapper_->set_tracking_modules(trackers_);
     mapper_->set_global_optimization_module(global_optimizer_);
-    global_optimizer_->set_tracking_module(tracker_);
+    global_optimizer_->set_tracking_module(trackers_);
 //    global_optimizer_->set_tracking_modules(tracker_);
     global_optimizer_->set_mapping_module(mapper_);
 }

@@ -33,6 +33,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     const cv::Mat mask = mask_img_path.empty() ? cv::Mat{} : cv::imread(mask_img_path, cv::IMREAD_GRAYSCALE);
 
     // build a SLAM system
+//    openvslam::system SLAM(cfg, vocab_file_path);
     openvslam::system SLAM(cfg, vocab_file_path, 2);
     // startup the SLAM process
     SLAM.startup();
@@ -56,25 +57,36 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     unsigned int num_frame = 0;
 
     bool is_not_end = true;
+    int count = 0;
+    openvslam::Mat44_t pose_1;
+    openvslam::Mat44_t pose_2;
     // run the SLAM in another thread
     std::thread thread([&]() {
         while (is_not_end) {
+            count += 1;
             is_not_end = video.read(frame);
-            auto _ = video2.read(frame2);
+            bool not_end_2 = video2.read(frame2);
 
             const auto tp_1 = std::chrono::steady_clock::now();
 
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-                SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
+                pose_1 = SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
             }
 
             if (!frame2.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-                SLAM.feed_monocular_frames(frame, timestamp, mask, 1);
+//                pose_2 = SLAM.feed_monocular_frames(frame2, timestamp, mask, 1);
             }
 
             const auto tp_2 = std::chrono::steady_clock::now();
+
+            if (count % 100 == 0) {
+                std::cout << "pose_1" << std::endl;
+                std::cout << pose_1 << std::endl;
+                std::cout << "pose_2" << std::endl;
+                std::cout << pose_2 << std::endl;
+            }
 
             const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
             if (num_frame % frame_skip == 0) {
@@ -153,6 +165,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 }
 
 int main(int argc, char* argv[]) {
+    std::cout << "main" << std::endl;
 #ifdef USE_STACK_TRACE_LOGGER
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
@@ -163,7 +176,7 @@ int main(int argc, char* argv[]) {
     auto help = op.add<popl::Switch>("h", "help", "produce help message");
     auto vocab_file_path = op.add<popl::Value<std::string>>("v", "vocab", "vocabulary file path");
     auto video_file_path = op.add<popl::Value<std::string>>("m", "video", "video file path");
-    auto video_file_path_2 = op.add<popl::Value<std::string>>("m2", "video2", "video file path2");
+    auto video_file_path_2 = op.add<popl::Value<std::string>>("n", "video2", "video file path2");
     auto config_file_path = op.add<popl::Value<std::string>>("c", "config", "config file path");
     auto mask_img_path = op.add<popl::Value<std::string>>("", "mask", "mask image path", "");
     auto frame_skip = op.add<popl::Value<unsigned int>>("", "frame-skip", "interval of frame skip", 1);
@@ -219,7 +232,7 @@ int main(int argc, char* argv[]) {
 
     // run tracking
     if (cfg->camera_->setup_type_ == openvslam::camera::setup_type_t::Monocular) {
-        mono_tracking(cfg, vocab_file_path->value(), video_file_path->value(), mask_img_path->value(),
+        mono_tracking(cfg, vocab_file_path->value(), video_file_path->value(), video_file_path_2->value(), mask_img_path->value(),
                       frame_skip->value(), no_sleep->is_set(), auto_term->is_set(),
                       eval_log->is_set(), map_db_path->value());
     }

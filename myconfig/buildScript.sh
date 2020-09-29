@@ -8,7 +8,7 @@ cmake \
     -DBUILD_TESTS=ON \
     ..
 make -j4
-
+<< COMMENT
 cd ../ros
 catkin_make \
     -DBUILD_WITH_MARCH_NATIVE=ON \
@@ -18,3 +18,4 @@ catkin_make \
     -DBOW_FRAMEWORK=DBoW2
 
 cd ../myconfig
+COMMENT

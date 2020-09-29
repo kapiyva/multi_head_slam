@@ -30,6 +30,10 @@ void global_optimization_module::set_tracking_module(tracking_module* tracker) {
     tracker_ = tracker;
 }
 
+void global_optimization_module::set_tracking_module(tracking_module** trackers) {
+    trackers_ = trackers;
+}
+
 void global_optimization_module::set_mapping_module(mapping_module* mapper) {
     mapper_ = mapper;
     loop_bundle_adjuster_->set_mapping_module(mapper);

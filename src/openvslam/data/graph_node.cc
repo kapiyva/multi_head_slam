@@ -327,19 +327,15 @@ void graph_node::recover_spanning_connections() {
         keyframe* max_weight_child = nullptr;
 
         for (const auto spanning_child : spanning_children_) {
-            std::cout << "gn 0" << std::endl;
             if (spanning_child->will_be_erased()) {
                 continue;
             }
 
             // get intersection between the parent candidates and the spanning-child's covisibilities
-            std::cout << "gn 1" << std::endl;
             const auto child_covisibilities = spanning_child->graph_node_->get_covisibilities();
-            std::cout << "gn 2" << std::endl;
             const auto intersection = extract_intersection(new_parent_candidates, child_covisibilities);
 
             // find the new parent (which has the maximum weight with the spanning child) from the intersection
-            std::cout << "gn 3" << std::endl;
             for (const auto parent_candidate : intersection) {
                 const auto weight = spanning_child->graph_node_->get_weight(parent_candidate);
                 if (max_weight < weight) {
@@ -427,21 +423,15 @@ bool graph_node::has_loop_edge() const {
 
 template<typename T, typename U>
 std::vector<keyframe*> graph_node::extract_intersection(const T& keyfrms_1, const U& keyfrms_2) {
-    std::cout << "gnode extract 0" << std::endl;
     std::vector<keyframe*> intersection;
     intersection.reserve(std::min(keyfrms_1.size(), keyfrms_2.size()));
-    std::cout << "gnode extract 1" << std::endl;
     for (const auto keyfrm_1 : keyfrms_1) {
         for (const auto keyfrm_2 : keyfrms_2) {
-            std::cout << "gnode extract 2" << std::endl;
-            std::cout << (*keyfrm_1 == *keyfrm_2) << std::endl;
             if (*keyfrm_1 == *keyfrm_2) {
-                std::cout << "gnode extract 3" << std::endl;
                 intersection.push_back(keyfrm_1);
             }
         }
     }
-    std::cout << "gnode extract 4" << std::endl;
     return intersection;
 }
 

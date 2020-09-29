@@ -34,6 +34,7 @@ public:
 
     //! Set the tracking module
     void set_tracking_module(tracking_module* tracker);
+    void set_tracking_module(tracking_module** trackers);
 
     //! Set the mapping module
     void set_mapping_module(mapping_module* mapper);
@@ -181,6 +182,7 @@ private:
 
     //! tracking module
     tracking_module* tracker_ = nullptr;
+    tracking_module** trackers_ = nullptr;
     //! mapping module
     mapping_module* mapper_ = nullptr;
 
