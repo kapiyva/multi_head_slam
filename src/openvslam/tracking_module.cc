@@ -163,11 +163,18 @@ void tracking_module::reset() {
     initializer_.reset();
     keyfrm_inserter_.reset();
 
-    mapper_->request_reset();
-    global_optimizer_->request_reset();
+    if (tracker_num == 0){
+        mapper_->request_reset();
+        global_optimizer_->request_reset();
 
-    bow_db_->clear();
-    map_db_->clear();
+        bow_db_->clear();
+        map_db_->clear();
+    }
+//    mapper_->request_reset();
+//    global_optimizer_->request_reset();
+//
+//    bow_db_->clear();
+//    map_db_->clear();
 
     data::frame::next_id_ = 0;
     data::keyframe::next_id_ = 0;
@@ -241,7 +248,8 @@ void tracking_module::track() {
         map_db_->update_frame_statistics(curr_frm_, tracking_state_ == tracker_state_t::Lost);
 
         // if tracking is failed within 5.0 sec after initialization, reset the system
-        constexpr float init_retry_thr = 5.0;
+//        constexpr float init_retry_thr = 5.0;
+        constexpr float init_retry_thr = 1000.0;
         if (tracking_state_ == tracker_state_t::Lost
             && curr_frm_.id_ - initializer_.get_initial_frame_id() < camera_->fps_ * init_retry_thr) {
             spdlog::info("tracking lost within {} sec after initialization", init_retry_thr);

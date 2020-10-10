@@ -352,9 +352,10 @@ Mat44_t system::feed_monocular_frames(const cv::Mat& img, const double timestamp
 
     const Mat44_t cam_pose_cw = trackers_[track_num]->track_monocular_image(img, timestamp, mask);
 
-    if (track_num == 0) {
-        frame_publisher_->update(trackers_[0]);
-        if (trackers_[0]->tracking_state_ == tracker_state_t::Tracking) {
+    int target = 0;
+    if (track_num == target) {
+        frame_publisher_->update(trackers_[target]);
+        if (trackers_[target]->tracking_state_ == tracker_state_t::Tracking) {
             map_publisher_->set_current_cam_pose(cam_pose_cw);
         }
     }
@@ -447,7 +448,10 @@ void system::check_reset_request() {
         continue;
     }
     if (reset_is_requested_) {
-        tracker_->reset();
+        for (int i = 0; i < 2; ++i) {
+            trackers_[i]->reset();
+        }
+//        tracker_->reset();
         reset_is_requested_ = false;
     }
 }

@@ -235,6 +235,9 @@ bool initializer::create_map_for_monocular(data::frame& curr_frm) {
 
     // scale the map so that the median of depths is 1.0
     const auto median_depth = init_keyfrm->compute_median_depth(init_keyfrm->camera_->model_type_ == camera::model_type_t::Equirectangular);
+    if (!median_depth) {
+        return false;
+    }
     const auto inv_median_depth = 1.0 / median_depth;
     if (curr_keyfrm->get_num_tracked_landmarks(1) < min_num_triangulated_ && median_depth < 0) {
         spdlog::info("seems to be wrong initialization, resetting");

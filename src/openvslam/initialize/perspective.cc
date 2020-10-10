@@ -60,9 +60,11 @@ bool perspective::initialize(const data::frame& cur_frm, const std::vector<int>&
     if (0.40 < rel_score_H && homography_solver.solution_is_valid()) {
         const Mat33_t H_ref_to_cur = homography_solver.get_best_H_21();
         const auto is_inlier_match = homography_solver.get_inlier_matches();
-        return reconstruct_with_H(H_ref_to_cur, is_inlier_match);
+        if (reconstruct_with_H(H_ref_to_cur, is_inlier_match)) {
+            return true;
+        }
     }
-    else if (fundamental_solver.solution_is_valid()) {
+    if (fundamental_solver.solution_is_valid()) {
         const Mat33_t F_ref_to_cur = fundamental_solver.get_best_F_21();
         const auto is_inlier_match = fundamental_solver.get_inlier_matches();
         return reconstruct_with_F(F_ref_to_cur, is_inlier_match);
