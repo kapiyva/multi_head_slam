@@ -1,3 +1,5 @@
+cd `dirname $0`
+mkdir ../build
 cd ../build
 cmake \
     -DBUILD_WITH_MARCH_NATIVE=ON \
