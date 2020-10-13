@@ -249,7 +249,7 @@ void tracking_module::track() {
 
         // if tracking is failed within 5.0 sec after initialization, reset the system
 //        constexpr float init_retry_thr = 5.0;
-        constexpr float init_retry_thr = 1000.0;
+        constexpr float init_retry_thr = 100.0;
         if (tracking_state_ == tracker_state_t::Lost
             && curr_frm_.id_ - initializer_.get_initial_frame_id() < camera_->fps_ * init_retry_thr) {
             spdlog::info("tracking lost within {} sec after initialization", init_retry_thr);

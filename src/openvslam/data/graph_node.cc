@@ -188,7 +188,6 @@ std::set<keyframe*> graph_node::get_connected_keyframes() const {
     while (!lock.try_lock()){
         continue;
     }
-
     std::set<keyframe*> keyfrms;
 
     for (const auto& keyfrm_and_weight : connected_keyfrms_and_weights_) {
@@ -213,7 +212,6 @@ std::vector<keyframe*> graph_node::get_top_n_covisibilities(const unsigned int n
     while (!lock.try_lock()){
         continue;
     }
-
     if (ordered_covisibilities_.size() < num_covisibilities) {
         return ordered_covisibilities_;
     }
@@ -249,7 +247,6 @@ unsigned int graph_node::get_weight(keyframe* keyfrm) const {
     while (!lock.try_lock()){
         continue;
     }
-
     if (connected_keyfrms_and_weights_.count(keyfrm)) {
         return connected_keyfrms_and_weights_.at(keyfrm);
     }
@@ -264,7 +261,6 @@ void graph_node::set_spanning_parent(keyframe* keyfrm) {
     while (!lock.try_lock()){
         continue;
     }
-
     assert(!spanning_parent_);
     spanning_parent_ = keyfrm;
 }
@@ -275,7 +271,6 @@ keyframe* graph_node::get_spanning_parent() const {
     while (!lock.try_lock()){
         continue;
     }
-
     return spanning_parent_;
 }
 
@@ -285,7 +280,6 @@ void graph_node::change_spanning_parent(keyframe* keyfrm) {
     while (!lock.try_lock()){
         continue;
     }
-
     spanning_parent_ = keyfrm;
     keyfrm->graph_node_->add_spanning_child(owner_keyfrm_);
 }

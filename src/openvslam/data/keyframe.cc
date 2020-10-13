@@ -136,10 +136,9 @@ nlohmann::json keyframe::to_json() const {
 }
 
 void keyframe::set_cam_pose(const Mat44_t& cam_pose_cw) {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     cam_pose_cw_ = cam_pose_cw;
@@ -161,50 +160,44 @@ void keyframe::set_cam_pose(const g2o::SE3Quat& cam_pose_cw) {
 Mat44_t keyframe::get_cam_pose() const {
 //    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock()) {
+    while (!lock.try_lock()){
         continue;
     }
-
     return cam_pose_cw_;
 }
 
 Mat44_t keyframe::get_cam_pose_inv() const {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
-
     return cam_pose_cw_;
 }
 
 
 Vec3_t keyframe::get_cam_center() const {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//     std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     return cam_center_;
 }
 
 Mat33_t keyframe::get_rotation() const {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     return cam_pose_cw_.block<3, 3>(0, 0);
 }
 
 Vec3_t keyframe::get_translation() const {
-    // std::lock_guard<std::mutex> lock(mtx_pose_);
+//    std::lock_guard<std::mutex> lock(mtx_pose_);
     std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     return cam_pose_cw_.block<3, 1>(0, 3);
@@ -221,20 +214,18 @@ void keyframe::compute_bow() {
 }
 
 void keyframe::add_landmark(landmark* lm, const unsigned int idx) {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     landmarks_.at(idx) = lm;
 }
 
 void keyframe::erase_landmark_with_index(const unsigned int idx) {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
     landmarks_.at(idx) = nullptr;
@@ -252,18 +243,16 @@ void keyframe::replace_landmark(landmark* lm, const unsigned int idx) {
 }
 
 std::vector<landmark*> keyframe::get_landmarks() const {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-    while (!lock.try_lock())
-    {
+    while (!lock.try_lock()){
         continue;
     }
-
     return landmarks_;
 }
 
 std::set<landmark*> keyframe::get_valid_landmarks() const {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock()){
         continue;
@@ -285,8 +274,8 @@ std::set<landmark*> keyframe::get_valid_landmarks() const {
 }
 
 unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_thr) const {
-    // std::lock_guard<std::mutex> lock(mtx_observations_);
-    std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
+    std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
     while (!lock.try_lock()){
         continue;
     }
@@ -323,9 +312,9 @@ unsigned int keyframe::get_num_tracked_landmarks(const unsigned int min_num_obs_
 }
 
 landmark* keyframe::get_landmark(const unsigned int idx) const {
-//     std::lock_guard<std::mutex> lock(mtx_observations_);
+//    std::lock_guard<std::mutex> lock(mtx_observations_);
     std::unique_lock<std::mutex> lock(mtx_observations_, std::defer_lock);
-    while (!lock.try_lock()) {
+    while (!lock.try_lock()){
         continue;
     }
     return landmarks_.at(idx);
@@ -350,7 +339,7 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const float unproj_y = (y - camera->cy_) * depth * camera->fy_inv_;
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
-                // std::lock_guard<std::mutex> lock(mtx_pose_);
+//                 std::lock_guard<std::mutex> lock(mtx_pose_);
                 std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
                 while (!lock.try_lock()){
                     continue;
@@ -372,7 +361,7 @@ Vec3_t keyframe::triangulate_stereo(const unsigned int idx) const {
                 const float unproj_y = (y - camera->cy_) * depth * camera->fy_inv_;
                 const Vec3_t pos_c{unproj_x, unproj_y, depth};
 
-                // std::lock_guard<std::mutex> lock(mtx_pose_);
+//                 std::lock_guard<std::mutex> lock(mtx_pose_);
                 std::unique_lock<std::mutex> lock(mtx_pose_, std::defer_lock);
                 while (!lock.try_lock()){
                     continue;
@@ -403,7 +392,7 @@ float keyframe::compute_median_depth(const bool abs) const {
             if (lock1.owns_lock()){
                 lock1.unlock();
             }
-            if (lock2.owns_lock()) {
+            if (lock2.owns_lock()){
                 lock2.unlock();
             }
         }
