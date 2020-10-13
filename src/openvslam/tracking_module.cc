@@ -189,6 +189,7 @@ void tracking_module::track() {
     if (tracking_state_ == tracker_state_t::NotInitialized) {
         tracking_state_ = tracker_state_t::Initializing;
     }
+
     last_tracking_state_ = tracking_state_;
 
     // check if pause is requested
@@ -206,7 +207,6 @@ void tracking_module::track() {
         }
 
         // update the reference keyframe, local keyframes, and local landmarks
-//        update_local_map();
         update_local_map(tracker_num);
 
         // pass all of the keyframes to the mapping module
@@ -248,8 +248,7 @@ void tracking_module::track() {
         map_db_->update_frame_statistics(curr_frm_, tracking_state_ == tracker_state_t::Lost);
 
         // if tracking is failed within 5.0 sec after initialization, reset the system
-//        constexpr float init_retry_thr = 5.0;
-        constexpr float init_retry_thr = 100.0;
+        constexpr float init_retry_thr = 5.0;
         if (tracking_state_ == tracker_state_t::Lost
             && curr_frm_.id_ - initializer_.get_initial_frame_id() < camera_->fps_ * init_retry_thr) {
             spdlog::info("tracking lost within {} sec after initialization", init_retry_thr);
@@ -360,7 +359,6 @@ void tracking_module::apply_landmark_replace() {
 }
 
 void tracking_module::update_last_frame() {
-
     auto last_ref_keyfrm = last_frm_.ref_keyfrm_;
     if (!last_ref_keyfrm) {
         return;

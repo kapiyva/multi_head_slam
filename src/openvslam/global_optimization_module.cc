@@ -32,6 +32,7 @@ void global_optimization_module::set_tracking_module(tracking_module* tracker) {
 
 void global_optimization_module::set_tracking_module(tracking_module** trackers) {
     trackers_ = trackers;
+    tracker_ = trackers[0];
 }
 
 void global_optimization_module::set_mapping_module(mapping_module* mapper) {

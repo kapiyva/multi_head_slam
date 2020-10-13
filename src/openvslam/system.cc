@@ -19,7 +19,7 @@
 namespace openvslam {
 
 system::system(const std::shared_ptr<config>& cfg, const std::string& vocab_file_path)
-    : cfg_(cfg), camera_(cfg->camera_), tracker_num(1){
+    : cfg_(cfg), camera_(cfg->camera_), tracker_num(0){
     spdlog::debug("CONSTRUCT: system");
 
     std::cout << R"(  ___               __   _____ _      _   __  __ )" << std::endl;

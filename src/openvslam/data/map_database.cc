@@ -84,8 +84,6 @@ void map_database::set_local_landmarks(const std::vector<landmark*>& local_lms, 
         std::lock_guard<std::mutex> lock(mtx_map_access_2);
         local_landmarks_2 = local_lms;
     }
-//    local_landmarks_ = local_lms;
-//    local_landmarks_vec.at(tracker_num) = local_lms;
 }
 
 std::vector<landmark*> map_database::get_local_landmarks() const {

@@ -71,7 +71,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-                pose_1 = SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
+//                pose_1 = SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
             }
 
             if (!frame2.empty() && (num_frame % frame_skip == 0)) {
@@ -81,7 +81,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 
             const auto tp_2 = std::chrono::steady_clock::now();
 
-            if (count % 100 == 0) {
+            if (count % 50 == 0) {
                 std::cout << "pose_1" << std::endl;
                 std::cout << pose_1 << std::endl;
                 std::cout << "pose_2" << std::endl;

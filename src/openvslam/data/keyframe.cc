@@ -172,9 +172,8 @@ Mat44_t keyframe::get_cam_pose_inv() const {
     while (!lock.try_lock()){
         continue;
     }
-    return cam_pose_cw_;
+    return cam_pose_wc_;
 }
-
 
 Vec3_t keyframe::get_cam_center() const {
 //     std::lock_guard<std::mutex> lock(mtx_pose_);

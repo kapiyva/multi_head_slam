@@ -130,7 +130,7 @@ void global_bundle_adjuster::optimize(const unsigned int lead_keyfrm_id_in_globa
     // 5. 最適化を実行
 
     optimizer.initializeOptimization();
-//    optimizer.optimize(num_iter_);
+    optimizer.optimize(num_iter_);
 
     if (force_stop_flag && *force_stop_flag) {
         return;
