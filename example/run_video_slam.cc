@@ -71,7 +71,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-//                pose_1 = SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
+                pose_1 = SLAM.feed_monocular_frames(frame, timestamp, mask, 0);
             }
 
             if (!frame2.empty() && (num_frame % frame_skip == 0)) {
@@ -155,7 +155,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 
     if (!map_db_path.empty()) {
         // output the map database
-        SLAM.save_map_database(map_db_path);
+//        SLAM.save_map_database(map_db_path);
     }
 
     std::sort(track_times.begin(), track_times.end());

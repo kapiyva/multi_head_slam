@@ -406,11 +406,11 @@ void system::resume_tracker() {
 }
 
 void system::request_reset() {
-//    std::lock_guard<std::mutex> lock(mtx_reset_);
-    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
-    while (!lock.try_lock()){
-        continue;
-    }
+    std::lock_guard<std::mutex> lock(mtx_reset_);
+//    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
+//    while (!lock.try_lock()){
+//        continue;
+//    }
     reset_is_requested_ = true;
 }
 
@@ -442,11 +442,11 @@ bool system::terminate_is_requested() const {
 }
 
 void system::check_reset_request() {
-//    std::lock_guard<std::mutex> lock(mtx_reset_);
-    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
-    while (!lock.try_lock()){
-        continue;
-    }
+    std::lock_guard<std::mutex> lock(mtx_reset_);
+//    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
+//    while (!lock.try_lock()){
+//        continue;
+//    }
     if (reset_is_requested_) {
         for (int i = 0; i < 2; ++i) {
             trackers_[i]->reset();
