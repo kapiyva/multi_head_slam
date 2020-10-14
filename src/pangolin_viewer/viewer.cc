@@ -13,8 +13,9 @@ namespace pangolin_viewer {
 
 viewer::viewer(const std::shared_ptr<openvslam::config>& cfg, openvslam::system* system,
                const std::shared_ptr<openvslam::publish::frame_publisher>& frame_publisher,
-               const std::shared_ptr<openvslam::publish::map_publisher>& map_publisher)
-    : system_(system), frame_publisher_(frame_publisher), map_publisher_(map_publisher),
+               const std::shared_ptr<openvslam::publish::map_publisher>& map_publisher,
+               const int tracker_num)
+    : system_(system), frame_publisher_(frame_publisher), map_publisher_(map_publisher),tracker_num(tracker_num),
       interval_ms_(1000.0f / cfg->yaml_node_["PangolinViewer.fps"].as<float>(30.0)),
       viewpoint_x_(cfg->yaml_node_["PangolinViewer.viewpoint_x"].as<float>(0.0)),
       viewpoint_y_(cfg->yaml_node_["PangolinViewer.viewpoint_y"].as<float>(-10.0)),
@@ -80,6 +81,9 @@ void viewer::run() {
         draw_horizontal_grid();
         // draw the current camera frustum
         draw_current_cam_pose(gl_cam_pose_wc);
+        if (tracker_num > 1) {
+            draw_current_cam_pose(get_current_cam_pose(1));
+        }
         // draw keyframes and graphs
         draw_keyframes();
         // draw landmarks
@@ -184,6 +188,12 @@ void viewer::draw_horizontal_grid() {
 
 pangolin::OpenGlMatrix viewer::get_current_cam_pose() {
     const auto cam_pose_cw = map_publisher_->get_current_cam_pose();
+    const pangolin::OpenGlMatrix gl_cam_pose_wc(cam_pose_cw.inverse().eval());
+    return gl_cam_pose_wc;
+}
+
+pangolin::OpenGlMatrix viewer::get_current_cam_pose(int i) {
+    const auto cam_pose_cw = map_publisher_->get_current_cam_pose(i);
     const pangolin::OpenGlMatrix gl_cam_pose_wc(cam_pose_cw.inverse().eval());
     return gl_cam_pose_wc;
 }

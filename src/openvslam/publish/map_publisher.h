@@ -39,6 +39,7 @@ public:
      * @param cam_pose_cw
      */
     void set_current_cam_pose(const Mat44_t& cam_pose_cw);
+    void set_current_cam_pose(const Mat44_t& cam_pose_cw, int i);
 
     /**
      * Get current camera pose
@@ -46,6 +47,7 @@ public:
      * @return
      */
     Mat44_t get_current_cam_pose();
+    Mat44_t get_current_cam_pose(int i);
 
     /**
      * Get all keyframes
@@ -73,6 +75,7 @@ private:
     //! mutex to access camera pose
     std::mutex mtx_cam_pose_;
     Mat44_t cam_pose_cw_ = Mat44_t::Identity();
+    Mat44_t cam_pose_cw_2 = Mat44_t::Identity();
 };
 
 } // namespace publish

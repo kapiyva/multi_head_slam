@@ -211,8 +211,10 @@ void tracking_module::track() {
 
         // pass all of the keyframes to the mapping module
         const auto keyfrms = map_db_->get_all_keyframes();
-        for (const auto keyfrm : keyfrms) {
-            mapper_->queue_keyframe(keyfrm);
+        if (tracker_num == 0) {
+            for (const auto keyfrm : keyfrms) {
+                mapper_->queue_keyframe(keyfrm);
+            }
         }
 
         // state transition to Tracking mode
@@ -245,12 +247,15 @@ void tracking_module::track() {
         tracking_state_ = succeeded ? tracker_state_t::Tracking : tracker_state_t::Lost;
 
         // update the frame statistics
-        map_db_->update_frame_statistics(curr_frm_, tracking_state_ == tracker_state_t::Lost);
+        if (tracker_num == 0) {
+            map_db_->update_frame_statistics(curr_frm_, tracking_state_ == tracker_state_t::Lost);
+        }
 
         // if tracking is failed within 5.0 sec after initialization, reset the system
         constexpr float init_retry_thr = 5.0;
         if (tracking_state_ == tracker_state_t::Lost
-            && curr_frm_.id_ - initializer_.get_initial_frame_id() < camera_->fps_ * init_retry_thr) {
+            && curr_frm_.id_ - initializer_.get_initial_frame_id() < camera_->fps_ * init_retry_thr
+            && tracker_num == 0) {
             spdlog::info("tracking lost within {} sec after initialization", init_retry_thr);
             system_->request_reset();
             return;
@@ -262,7 +267,7 @@ void tracking_module::track() {
         }
 
         // check to insert the new keyframe derived from the current frame
-        if (succeeded && new_keyframe_is_needed()) {
+        if (succeeded && new_keyframe_is_needed() && tracker_num == 0) {
             insert_new_keyframe();
         }
 

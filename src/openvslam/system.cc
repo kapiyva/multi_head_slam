@@ -202,6 +202,9 @@ void system::startup(const bool need_initialize) {
     if (!need_initialize) {
         tracker_->tracking_state_ = tracker_state_t::Lost;
     }
+    if (tracker_num > 1) {
+        trackers_[1]->tracking_state_ = tracker_state_t::Lost;
+    }
 
     mapping_thread_ = std::unique_ptr<std::thread>(new std::thread(&openvslam::mapping_module::run, mapper_));
     global_optimization_thread_ = std::unique_ptr<std::thread>(new std::thread(&openvslam::global_optimization_module::run, global_optimizer_));
@@ -355,9 +358,9 @@ Mat44_t system::feed_monocular_frames(const cv::Mat& img, const double timestamp
     int target = 0;
     if (track_num == target) {
         frame_publisher_->update(trackers_[target]);
-        if (trackers_[target]->tracking_state_ == tracker_state_t::Tracking) {
-            map_publisher_->set_current_cam_pose(cam_pose_cw);
-        }
+    }
+    if (trackers_[target]->tracking_state_ == tracker_state_t::Tracking) {
+        map_publisher_->set_current_cam_pose(cam_pose_cw, track_num);
     }
 
     return cam_pose_cw;

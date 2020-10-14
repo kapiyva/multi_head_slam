@@ -35,7 +35,8 @@ public:
      */
     viewer(const std::shared_ptr<openvslam::config>& cfg, openvslam::system* system,
            const std::shared_ptr<openvslam::publish::frame_publisher>& frame_publisher,
-           const std::shared_ptr<openvslam::publish::map_publisher>& map_publisher);
+           const std::shared_ptr<openvslam::publish::map_publisher>& map_publisher,
+           const int tracker_num=0);
 
     /**
      * Main loop for window refresh
@@ -71,6 +72,7 @@ private:
      * @return
      */
     pangolin::OpenGlMatrix get_current_cam_pose();
+    pangolin::OpenGlMatrix get_current_cam_pose(int i);
 
     /**
      * Draw the horizontal grid
@@ -199,6 +201,7 @@ private:
     bool terminate_is_requested_ = false;
     //! flag which indicates whether the main loop is terminated or not
     bool is_terminated_ = true;
+    int tracker_num = 1;
 };
 
 inline void viewer::draw_line(const float x1, const float y1, const float z1,
