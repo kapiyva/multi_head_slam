@@ -57,15 +57,16 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     unsigned int num_frame = 0;
 
     bool is_not_end = true;
+    bool not_end_2 = true;
     int count = 0;
     openvslam::Mat44_t pose_1;
     openvslam::Mat44_t pose_2;
     // run the SLAM in another thread
     std::thread thread([&]() {
-        while (is_not_end) {
+        while (is_not_end || not_end_2) {
             count += 1;
             is_not_end = video.read(frame);
-            bool not_end_2 = video2.read(frame2);
+            not_end_2 = video2.read(frame2);
 
             const auto tp_1 = std::chrono::steady_clock::now();
 
