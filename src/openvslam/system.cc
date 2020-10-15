@@ -203,7 +203,9 @@ void system::startup(const bool need_initialize) {
         tracker_->tracking_state_ = tracker_state_t::Lost;
     }
     if (tracker_num > 1) {
-        trackers_[1]->tracking_state_ = tracker_state_t::Lost;
+        for (int i = 1; i < tracker_num; ++i) {
+            trackers_[i]->tracking_state_ = tracker_state_t::Lost;
+        }
     }
 
     mapping_thread_ = std::unique_ptr<std::thread>(new std::thread(&openvslam::mapping_module::run, mapper_));
