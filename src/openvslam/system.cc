@@ -356,7 +356,7 @@ Mat44_t system::feed_monocular_frames(const cv::Mat& img, const double timestamp
     if (track_num == target) {
         frame_publisher_->update(trackers_[target]);
     }
-    if (trackers_[target]->tracking_state_ == tracker_state_t::Tracking) {
+    if (trackers_[track_num]->tracking_state_ == tracker_state_t::Tracking) {
         map_publisher_->set_current_cam_pose(cam_pose_cw, track_num);
     }
 

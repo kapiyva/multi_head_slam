@@ -23,7 +23,7 @@ struct orb_params {
     //! Dump parameter values to the standard output
     void show_parameters() const;
 
-    unsigned int max_num_keypts_ = 2000;
+    unsigned int max_num_keypts_ = 4000;
     float scale_factor_ = 1.2;
     unsigned int num_levels_ = 8;
     unsigned int ini_fast_thr_ = 20;
