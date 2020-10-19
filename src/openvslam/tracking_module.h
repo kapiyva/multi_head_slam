@@ -259,6 +259,8 @@ protected:
 
     //! Pause of the tracking module is requested or not
     bool pause_is_requested_ = false;
+
+    bool map_rights = false;
 };
 
 } // namespace openvslam

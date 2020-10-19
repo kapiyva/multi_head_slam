@@ -41,7 +41,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     // create a viewer object
     // and pass the frame_publisher and the map_publisher
 #ifdef USE_PANGOLIN_VIEWER
-    pangolin_viewer::viewer viewer(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher());
+    pangolin_viewer::viewer viewer(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher(), 2);
 #elif USE_SOCKET_PUBLISHER
     socket_publisher::publisher publisher(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher());
 #endif
@@ -57,15 +57,16 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     unsigned int num_frame = 0;
 
     bool is_not_end = true;
+    bool is_not_end_2 = true;
     int count = 0;
     openvslam::Mat44_t pose_1;
     openvslam::Mat44_t pose_2;
     // run the SLAM in another thread
     std::thread thread([&]() {
-        while (is_not_end) {
+        while (is_not_end || is_not_end_2) {
             count += 1;
             is_not_end = video.read(frame);
-            bool not_end_2 = video2.read(frame2);
+            is_not_end_2 = video2.read(frame2);
 
             const auto tp_1 = std::chrono::steady_clock::now();
 
