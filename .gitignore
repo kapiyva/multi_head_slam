@@ -5,6 +5,7 @@ lib/
 cmake-build-debug/
 cmake-build-release/
 myconfig/video*
+myconfig/test*
 */.python-version
 *.user
 *.DS_Store
