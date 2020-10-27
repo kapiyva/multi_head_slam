@@ -58,6 +58,11 @@ bool keyframe_inserter::new_keyframe_is_needed(const data::frame& curr_frm, cons
         return false;
     }
 
+    if (num_tracked_lms < 60) {
+        std::cout << "force add" << std::endl;
+        return true;
+    }
+
     // Aのいずれも満たされていなければ追加しない
     if (!cond_a1 && !cond_a2 && !cond_a3) {
         return false;

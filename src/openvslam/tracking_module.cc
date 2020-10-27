@@ -42,7 +42,7 @@ tracking_module::tracking_module(const std::shared_ptr<config>& cfg, system* sys
     : cfg_(cfg), camera_(cfg->camera_), tracker_num(tn), system_(system), map_db_(map_db), bow_vocab_(bow_vocab), bow_db_(bow_db),
       initializer_(cfg->camera_->setup_type_, map_db, bow_db, cfg->yaml_node_),
       frame_tracker_(camera_, 10), relocalizer_(bow_db_), pose_optimizer_(),
-      keyfrm_inserter_(cfg_->camera_->setup_type_, cfg_->true_depth_thr_, map_db, bow_db, 0, cfg_->camera_->fps_) {
+      keyfrm_inserter_(cfg_->camera_->setup_type_, cfg_->true_depth_thr_, map_db, bow_db, 0, cfg_->camera_->fps_*2) {
     spdlog::debug("CONSTRUCT: tracking_module");
 
     extractor_left_ = new feature::orb_extractor(cfg_->orb_params_);
@@ -249,9 +249,9 @@ void tracking_module::track() {
 
         // state transition
         tracking_state_ = succeeded ? tracker_state_t::Tracking : tracker_state_t::Lost;
-        if (!succeeded && tracker_num != 0) {
-            map_rights = false;
-        }
+//        if (!succeeded && tracker_num != 0) {
+//            map_rights = false;
+//        }
 
         // update the frame statistics
         if (tracker_num == 0) {
