@@ -82,13 +82,6 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
 
             const auto tp_2 = std::chrono::steady_clock::now();
 
-            if (count % 50 == 0) {
-                std::cout << "pose_1" << std::endl;
-                std::cout << pose_1 << std::endl;
-                std::cout << "pose_2" << std::endl;
-                std::cout << pose_2 << std::endl;
-            }
-
             const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
             if (num_frame % frame_skip == 0) {
                 track_times.push_back(track_time);
