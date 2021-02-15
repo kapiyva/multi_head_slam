@@ -443,12 +443,8 @@ bool system::terminate_is_requested() const {
 
 void system::check_reset_request() {
     std::lock_guard<std::mutex> lock(mtx_reset_);
-//    std::unique_lock<std::mutex> lock(mtx_reset_, std::defer_lock);
-//    while (!lock.try_lock()){
-//        continue;
-//    }
     if (reset_is_requested_) {
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < tracker_num; ++i) {
             trackers_[i]->reset();
         }
 //        tracker_->reset();

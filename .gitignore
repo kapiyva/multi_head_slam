@@ -1,11 +1,14 @@
 build/
 devel/
 lib/
+myconfig/*.txt
 .idea/
 cmake-build-debug/
 cmake-build-release/
 myconfig/video*
 myconfig/test*
+myconfig/bag*
+myconfig/kitti_dataset*
 */.python-version
 *.user
 *.DS_Store

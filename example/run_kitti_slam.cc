@@ -37,14 +37,14 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     const auto frames = sequence.get_frames();
 
     // build a SLAM system
-    openvslam::system SLAM(cfg, vocab_file_path);
+    openvslam::system SLAM(cfg, vocab_file_path,2);
     // startup the SLAM process
     SLAM.startup();
 
     // create a viewer object
     // and pass the frame_publisher and the map_publisher
 #ifdef USE_PANGOLIN_VIEWER
-    pangolin_viewer::viewer viewer(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher());
+    pangolin_viewer::viewer viewer(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher(),2);
 #elif USE_SOCKET_PUBLISHER
     socket_publisher::publisher publisher(cfg, &SLAM, SLAM.get_frame_publisher(), SLAM.get_map_publisher());
 #endif
@@ -57,12 +57,14 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
         for (unsigned int i = 0; i < frames.size(); ++i) {
             const auto& frame = frames.at(i);
             const auto img = cv::imread(frame.left_img_path_, cv::IMREAD_UNCHANGED);
+            const auto right_img = cv::imread(frame.right_img_path_, cv::IMREAD_UNCHANGED);
 
             const auto tp_1 = std::chrono::steady_clock::now();
 
             if (!img.empty() && (i % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
-                SLAM.feed_monocular_frame(img, frame.timestamp_);
+                SLAM.feed_monocular_frames(img, frame.timestamp_,cv::Mat{},0);
+                SLAM.feed_monocular_frames(right_img, frame.timestamp_,cv::Mat{},1);
             }
 
             const auto tp_2 = std::chrono::steady_clock::now();

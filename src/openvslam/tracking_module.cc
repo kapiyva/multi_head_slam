@@ -34,6 +34,7 @@ tracking_module::tracking_module(const std::shared_ptr<config>& cfg, system* sys
     if (camera_->setup_type_ == camera::setup_type_t::Stereo) {
         extractor_right_ = new feature::orb_extractor(cfg_->orb_params_);
     }
+    map_rights = true;
 }
 
 
