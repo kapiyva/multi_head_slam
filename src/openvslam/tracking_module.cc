@@ -14,6 +14,10 @@
 #include <chrono>
 #include <unordered_map>
 
+#include <string>
+#include <fstream>
+#include <sstream>
+
 #include <spdlog/spdlog.h>
 
 namespace openvslam {
@@ -649,13 +653,20 @@ bool tracking_module::new_keyframe_is_needed() const {
         return false;
     }
 
+//    std::ofstream outputFile;
+//    outputFile.open("queueLog.csv", std::ios::app);
+//    outputFile << curr_frm_.timestamp_ << ',';
+//    outputFile << mapper_->get_num_queued_keyframes() << std::endl;
+//    outputFile.close();
+
     // check the new keyframe is needed
     return keyfrm_inserter_.new_keyframe_is_needed(curr_frm_, num_tracked_lms_, *ref_keyfrm_);
 }
 
 void tracking_module::insert_new_keyframe() {
+
     // insert the new keyframe
-    const auto ref_keyfrm = keyfrm_inserter_.insert_new_keyframe(curr_frm_);
+    const auto ref_keyfrm = keyfrm_inserter_.insert_new_keyframe(curr_frm_, tracker_num);
     // set the reference keyframe with the new keyframe
     ref_keyfrm_ = ref_keyfrm ? ref_keyfrm : ref_keyfrm_;
     curr_frm_.ref_keyfrm_ = ref_keyfrm_;

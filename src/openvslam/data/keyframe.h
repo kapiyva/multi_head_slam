@@ -50,6 +50,7 @@ public:
      * Constructor for building from a frame
      */
     keyframe(const frame& frm, map_database* map_db, bow_database* bow_db);
+    keyframe(const frame& frm, map_database* map_db, bow_database* bow_db, int i);
 
     /**
      * Constructor for map loading
@@ -214,6 +215,8 @@ public:
 
     //! keyframe ID
     unsigned int id_;
+
+    unsigned int tracker_num_;
     //! next keyframe ID
     static std::atomic<unsigned int> next_id_;
 

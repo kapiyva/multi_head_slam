@@ -402,10 +402,6 @@ void map_database::register_association(const unsigned int keyfrm_id, const nloh
 
 void map_database::to_json(nlohmann::json& json_keyfrms, nlohmann::json& json_landmarks) {
     std::lock_guard<std::mutex> lock(mtx_map_access_);
-//    std::unique_lock<std::mutex> lock(mtx_map_access_, std::defer_lock);
-//    while(!lock.try_lock()){
-//        continue;
-//    }
 
     // Save each keyframe as json
     spdlog::info("encoding {} keyframes to store", keyframes_.size());

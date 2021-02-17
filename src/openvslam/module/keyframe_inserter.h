@@ -38,7 +38,8 @@ public:
     /**
      * Insert the new keyframe derived from the current frame
      */
-    data::keyframe* insert_new_keyframe(data::frame& curr_frm);
+//    data::keyframe* insert_new_keyframe(data::frame& curr_frm);
+    data::keyframe* insert_new_keyframe(data::frame& curr_frm, int i);
 
 private:
     /**

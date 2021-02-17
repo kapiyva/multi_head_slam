@@ -148,8 +148,8 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg,
     }
 
     if (!map_db_path.empty()) {
-        // output the map database
-//        SLAM.save_map_database(map_db_path);
+//         output the map database
+        SLAM.save_map_database(map_db_path);
     }
 
     std::sort(track_times.begin(), track_times.end());

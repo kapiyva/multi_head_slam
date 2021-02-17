@@ -58,6 +58,7 @@ bool keyframe_inserter::new_keyframe_is_needed(const data::frame& curr_frm, cons
         return false;
     }
 
+    // ランドマークが一定以下の場合強制追加
     if (num_tracked_lms < 60) {
         return true;
     }
@@ -74,7 +75,7 @@ bool keyframe_inserter::new_keyframe_is_needed(const data::frame& curr_frm, cons
 
     // mapping moduleが処理中だったら，local BAを止めてキーフレームを追加する
     if (setup_type_ != camera::setup_type_t::Monocular
-        && mapper_->get_num_queued_keyframes() <= 2) {
+        && mapper_->get_num_queued_keyframes() <=4) {
         mapper_->abort_local_BA();
         return true;
     }
@@ -82,14 +83,14 @@ bool keyframe_inserter::new_keyframe_is_needed(const data::frame& curr_frm, cons
     return false;
 }
 
-data::keyframe* keyframe_inserter::insert_new_keyframe(data::frame& curr_frm) {
+data::keyframe* keyframe_inserter::insert_new_keyframe(data::frame& curr_frm, int i = 0) {
     // mapping moduleを(強制的に)動かす
     if (!mapper_->set_force_to_run(true)) {
         return nullptr;
     }
 
     curr_frm.update_pose_params();
-    auto keyfrm = new data::keyframe(curr_frm, map_db_, bow_db_);
+    auto keyfrm = new data::keyframe(curr_frm, map_db_, bow_db_, i);
 
     frm_id_of_last_keyfrm_ = curr_frm.id_;
 

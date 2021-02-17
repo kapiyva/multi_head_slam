@@ -19,7 +19,32 @@ std::atomic<unsigned int> keyframe::next_id_{0};
 
 keyframe::keyframe(const frame& frm, map_database* map_db, bow_database* bow_db)
     : // meta information
-      id_(next_id_++), src_frm_id_(frm.id_), timestamp_(frm.timestamp_),
+    id_(next_id_++), tracker_num_(0) ,src_frm_id_(frm.id_), timestamp_(frm.timestamp_),
+    // camera parameters
+    camera_(frm.camera_), depth_thr_(frm.depth_thr_),
+    // constant observations
+    num_keypts_(frm.num_keypts_), keypts_(frm.keypts_), undist_keypts_(frm.undist_keypts_), bearings_(frm.bearings_),
+    keypt_indices_in_cells_(frm.keypt_indices_in_cells_),
+    stereo_x_right_(frm.stereo_x_right_), depths_(frm.depths_), descriptors_(frm.descriptors_.clone()),
+    // BoW
+    bow_vec_(frm.bow_vec_), bow_feat_vec_(frm.bow_feat_vec_),
+    // covisibility graph node (connections is not assigned yet)
+    graph_node_(std::unique_ptr<graph_node>(new graph_node(this, true))),
+    // ORB scale pyramid
+    num_scale_levels_(frm.num_scale_levels_), scale_factor_(frm.scale_factor_),
+    log_scale_factor_(frm.log_scale_factor_), scale_factors_(frm.scale_factors_),
+    level_sigma_sq_(frm.level_sigma_sq_), inv_level_sigma_sq_(frm.inv_level_sigma_sq_),
+    // observations
+    landmarks_(frm.landmarks_),
+    // databases
+    map_db_(map_db), bow_db_(bow_db), bow_vocab_(frm.bow_vocab_) {
+    // set pose parameters (cam_pose_wc_, cam_center_) using frm.cam_pose_cw_
+    set_cam_pose(frm.cam_pose_cw_);
+}
+
+keyframe::keyframe(const frame& frm, map_database* map_db, bow_database* bow_db, int i=0)
+    : // meta information
+      id_(next_id_++), tracker_num_(i) ,src_frm_id_(frm.id_), timestamp_(frm.timestamp_),
       // camera parameters
       camera_(frm.camera_), depth_thr_(frm.depth_thr_),
       // constant observations

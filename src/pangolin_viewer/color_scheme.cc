@@ -22,7 +22,8 @@ void color_scheme::set_color_as_white() {
     grid_ = {{0.7f, 0.7f, 0.7f}};
     curr_cam_ = {{0.0f, 1.0f, 0.0f}};
     kf_line_ = {{0.0f, 0.0f, 1.0f}};
-    graph_line_ = {{0.0f, 1.0f, 0.0f, 0.6f}};
+    kf_line_2 = {{1.0f, 0.6f, 0.0f}};
+    graph_line_ = {{1.0f, 1.0f, 0.0f, 0.6f}};
     lm_ = {{0.0f, 0.0f, 0.0f}};
     local_lm_ = {{1.0f, 0.0f, 0.0f}};
 }
@@ -32,6 +33,7 @@ void color_scheme::set_color_as_black() {
     grid_ = {{0.3f, 0.3f, 0.3f}};
     curr_cam_ = {{0.7f, 0.7f, 1.0f}};
     kf_line_ = {{0.0f, 1.0f, 0.0f}};
+    kf_line_2 = {{1.0f, 0.6f, 0.0f}};
     graph_line_ = {{0.7f, 0.7f, 1.0f, 0.4f}};
     lm_ = {{0.9f, 0.9f, 0.9f}};
     local_lm_ = {{1.0f, 0.1f, 0.1f}};

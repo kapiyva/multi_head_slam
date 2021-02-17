@@ -46,7 +46,7 @@ viewer::viewer(const std::shared_ptr<openvslam::config>& cfg, openvslam::system*
       point_size_(cfg->yaml_node_["PangolinViewer.point_size"].as<unsigned int>(2)),
       camera_size_(cfg->yaml_node_["PangolinViewer.camera_size"].as<float>(0.15)),
       camera_line_width_(cfg->yaml_node_["PangolinViewer.camera_line_width"].as<unsigned int>(2)),
-      cs_(cfg->yaml_node_["PangolinViewer.color_scheme"].as<std::string>("black")),
+      cs_(cfg->yaml_node_["PangolinViewer.color_scheme"].as<std::string>("white")),
       mapping_mode_(system->mapping_module_is_enabled()),
       loop_detection_mode_(system->loop_detector_is_enabled()) {}
 
@@ -235,10 +235,16 @@ void viewer::draw_keyframes() {
 
     if (*menu_show_keyfrms_) {
         glLineWidth(keyfrm_line_width_);
-        glColor3fv(cs_.kf_line_.data());
+//        glColor3fv(cs_.kf_line_.data());
         for (const auto keyfrm : keyfrms) {
             if (!keyfrm || keyfrm->will_be_erased()) {
                 continue;
+            }
+            if (keyfrm->tracker_num_ == 0) {
+                glColor3fv(cs_.kf_line_.data());
+            }
+            else {
+                glColor3fv(cs_.kf_line_2.data());
             }
             draw_camera(keyfrm->get_cam_pose_inv(), w);
         }

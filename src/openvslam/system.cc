@@ -208,6 +208,7 @@ void system::startup(const bool need_initialize) {
 }
 
 void system::shutdown() {
+    std::cout << "num_keyframes" << map_db_->get_num_keyframes() << std::endl;
     // terminate the other threads
     mapper_->request_terminate();
     global_optimizer_->request_terminate();
