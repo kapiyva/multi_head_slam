@@ -3,7 +3,12 @@
 Ubuntu-18.04で動作確認済み
 
 # インストール方法
-ダウンロード後、scripts/installScript.shを実行すると依存ソフトウェアのインストールと本体のビルドを行う。  
+ダウンロード後、インストールスクリプトに実行権限を与えて実行すると依存ソフトウェアのインストールと本体のビルドを行う。  
+multi_head_slamディレクトリ直下で以下のコマンドを実行。  
+``sudo chmod +x scripts/installScript.sh``  
+``sudo chmod +x scripts/buildScript.sh``  
+``scipts/installScript.sh``
+
 ビルド後のbuild/run_video_slamが作成システムに当たる。
 
 # 実行オプション
@@ -12,11 +17,12 @@ Ubuntu-18.04で動作確認済み
 -m ビデオ1  
 -n ビデオ2  
 
-*scripts/run_demo.sh*か*scripts/run_opendataset.sh*を確認するとわかりやすいかも  
-その他詳細なオプションは[openvslamのドキュメント](https://openvslam.readthedocs.io/en/master/simple_tutorial.html#tracking-and-mapping)を参照  
+*scripts/run_demo.sh*か*scripts/run_opendataset.sh*を確認するとわかりやすいかも。  
+その他詳細なオプションは[openvslamのドキュメント](https://openvslam.readthedocs.io/en/master/simple_tutorial.html#tracking-and-mapping)を参照。  
 
 # 自作スクリプト群
-scripts以下に配置
+scripts以下に配置  
+
 
 * installScript  
 依存ソフトウェアのインストールから本体のビルドまで一式やる。  
@@ -32,5 +38,5 @@ scripts以下に配置
 * run_openDataset  
   OpenVSLAMのサンプルデータセットを使用してプログラムを実行。  
   aist_entrance_hallとaist_living_labの2種類があるため、e, lをオプションに指定する。  
-  ex)  
+  例）  
     `scripts/run_openDataset.sh l`
