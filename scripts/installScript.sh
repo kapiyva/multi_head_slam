@@ -93,5 +93,6 @@ cmake \
 make -j4
 sudo make install
 
-cd `dirname $0`
+cd $GARAGE
+cd ..
 ./buildScript.sh

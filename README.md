@@ -5,15 +5,14 @@ Ubuntu-18.04で動作確認済み
 # インストール方法
 ダウンロード後、インストールスクリプトに実行権限を与えて実行すると依存ソフトウェアのインストールと本体のビルドを行う。  
 multi_head_slamディレクトリ直下で以下のコマンドを実行。  
-``sudo chmod +x scripts/installScript.sh``  
-``sudo chmod +x scripts/buildScript.sh``  
+``sudo chmod +x scripts/*.sh``  
 ``scipts/installScript.sh``
 
 ビルド後のbuild/run_video_slamが作成システムに当たる。
 
 # 実行オプション
- -c カメラコンフィグ  
- -v orbのボキャブラリーファイル。datasetのorb_vocab.dbow2を参照  
+-c カメラコンフィグ  
+-v orbのボキャブラリーファイル。datasetのorb_vocab.dbow2を参照  
 -m ビデオ1  
 -n ビデオ2  
 
@@ -22,7 +21,6 @@ multi_head_slamディレクトリ直下で以下のコマンドを実行。
 
 # 自作スクリプト群
 scripts以下に配置  
-
 
 * installScript  
 依存ソフトウェアのインストールから本体のビルドまで一式やる。  
