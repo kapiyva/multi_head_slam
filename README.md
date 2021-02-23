@@ -31,9 +31,11 @@ scripts以下に配置
   ソースコードに変更を加えたらこれを実行すればビルドしてくれる。
 
 * run_demo  
+  研究室関係者向け。  
   Thetaを使って撮影したL棟前でのデモデータセットを使用してプログラムを実行。
 
 * run_openDataset  
+  研究室関係者向け。  
   OpenVSLAMのサンプルデータセットを使用してプログラムを実行。  
   aist_entrance_hallとaist_living_labの2種類があるため、e, lをオプションに指定する。  
   例）  
