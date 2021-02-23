@@ -1,6 +1,7 @@
 build/
 devel/
 lib/
+dataset/garage
 .idea/
 cmake-build-debug/
 cmake-build-release/
